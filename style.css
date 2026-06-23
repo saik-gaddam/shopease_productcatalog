@@ -54,6 +54,7 @@ body {
   font-size: 1.4rem;
   color: var(--primary);
   text: center;
+  align-item: center;
 }
 
 .header-actions {
