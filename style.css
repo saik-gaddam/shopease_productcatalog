@@ -52,7 +52,7 @@ body {
 .logo {
   margin: 0;
   font-size: 1.4rem;
-  color: var(--primary)
+  color: var(--primary);
   text: center;
 }
 
