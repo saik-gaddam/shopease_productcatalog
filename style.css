@@ -53,7 +53,7 @@ body {
   margin: 0;
   font-size: 1.4rem;
   color: var(--primary)
-  align-item: center;
+  text: center;
 }
 
 .header-actions {
