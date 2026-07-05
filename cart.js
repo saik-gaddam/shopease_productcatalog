@@ -1,4 +1,3 @@
-// Application Cart Operations State Manager Engine
 const Cart = (() => {
   let items = [];
 
