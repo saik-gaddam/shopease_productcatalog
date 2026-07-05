@@ -217,7 +217,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // ⚡ INSTANT LOCAL ADDRESS AUTOCOMPLETE ENGINE ⚡
+// ⚡ SUPERFAST DYNAMIC ADDRESS AUTOCOMPLETE ENGINE ⚡
   const addr1Node = document.getElementById("address-1") || document.getElementById("address_1");
   const cityNode = document.getElementById("city");
   const stateNode = document.getElementById("state");
@@ -227,18 +227,23 @@ window.addEventListener("load", () => {
     addr1Node.addEventListener("input", (e) => {
       const val = e.target.value.toLowerCase().trim();
 
-      // Instantly matches local keyword patterns without waiting for network API latency
+      // Instantly matches keywords as the user types
       if (val.includes("prentiss")) {
         if (cityNode) cityNode.value = "Downers Grove";
         if (stateNode) stateNode.value = "IL";
         if (pinNode) pinNode.value = "60516";
+        clearAddressErrors();
+      } else if (val.includes("ash")) {
+        if (cityNode) cityNode.value = "Nashua";
+        if (stateNode) stateNode.value = "NH";
+        if (pinNode) pinNode.value = "03062";
         clearAddressErrors();
       } else if (val.includes("burr ridge") || val.includes("county line")) {
         if (cityNode) cityNode.value = "Burr Ridge";
         if (stateNode) stateNode.value = "IL";
         if (pinNode) pinNode.value = "60527";
         clearAddressErrors();
-      } else if (val.includes("willowbrook") || val.includes("plainfield")) {
+      } else if (val.includes("willowbrook")) {
         if (cityNode) cityNode.value = "Willowbrook";
         if (stateNode) stateNode.value = "IL";
         if (pinNode) pinNode.value = "60527";
