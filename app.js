@@ -1,299 +1,214 @@
-/**
- * ShopEase - Main app logic
- * Handles rendering, filtering/search/sort, cart UI, and checkout flow.
- */
-
+// Application UI Controller Logic
 document.addEventListener("DOMContentLoaded", () => {
-  // ---------- Element references ----------
-  const productGrid = document.getElementById("productGrid");
-  const searchInput = document.getElementById("searchInput");
-  const categorySelect = document.getElementById("categoryFilter");
-  const sortSelect = document.getElementById("sortFilter");
-  const noResults = document.getElementById("noResults");
-
-  const cartIcon = document.getElementById("cartIcon");
-  const cartCount = document.getElementById("cartCount");
-  const cartDrawer = document.getElementById("cartDrawer");
-  const cartOverlay = document.getElementById("cartOverlay");
-  const closeCartBtn = document.getElementById("closeCartBtn");
-  const cartItemsContainer = document.getElementById("cartItems");
-  const cartEmptyMsg = document.getElementById("cartEmptyMsg");
-  const cartSubtotal = document.getElementById("cartSubtotal");
-  const checkoutBtn = document.getElementById("checkoutBtn");
-
-  const checkoutModal = document.getElementById("checkoutModal");
-  const checkoutOverlay = document.getElementById("checkoutOverlay");
-  const closeCheckoutBtn = document.getElementById("closeCheckoutBtn");
-  const checkoutForm = document.getElementById("checkoutForm");
-  const checkoutTotal = document.getElementById("checkoutTotal");
-  const confirmationView = document.getElementById("confirmationView");
-  const orderIdSpan = document.getElementById("orderId");
-
-  const darkModeToggle = document.getElementById("darkModeToggle");
-  const toast = document.getElementById("toast");
-
-  // ---------- Helpers ----------
-  function formatCurrency(amount) {
-    return "₹" + amount.toLocaleString("en-IN");
+  // Theme Configuration Initialization
+  if (localStorage.getItem("dark-theme") === "true") {
+    document.body.classList.add("dark-theme");
   }
 
-  function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add("show");
-    setTimeout(() => toast.classList.remove("show"), 2000);
-  }
+  // Bind Element Hooks
+  const productGrid = document.getElementById("product-grid");
+  const searchInput = document.getElementById("search-input");
+  const categoryFilter = document.getElementById("category-filter");
+  const sortSelect = document.getElementById("sort-select");
+  const themeToggle = document.getElementById("theme-toggle");
+  
+  const cartBtn = document.getElementById("cart-btn");
+  const closeCart = document.getElementById("close-cart");
+  const cartDrawer = document.getElementById("cart-drawer");
+  const cartItemsContainer = document.getElementById("cart-items");
+  const cartCountBadge = document.getElementById("cart-count");
+  const cartSubtotalText = document.getElementById("cart-subtotal");
+  const checkoutBtn = document.getElementById("checkout-btn");
 
-  function renderStars(rating) {
-    const fullStars = Math.round(rating);
-    return "★".repeat(fullStars) + "☆".repeat(5 - fullStars);
-  }
+  const checkoutModal = document.getElementById("checkout-modal");
+  const closeModal = document.getElementById("close-modal");
+  const checkoutForm = document.getElementById("checkout-form");
+  const confirmationModal = document.getElementById("confirmation-modal");
+  const closeConfirmation = document.getElementById("close-confirmation");
+  const summaryOrderId = document.getElementById("summary-order-id");
 
-  // ---------- Product rendering ----------
-  function getFilteredProducts() {
-    let result = [...PRODUCTS];
-
-    const search = searchInput.value.trim().toLowerCase();
-    if (search) {
-      result = result.filter(
-        (p) =>
-          p.title.toLowerCase().includes(search) ||
-          p.description.toLowerCase().includes(search)
-      );
+  // Core Dynamic Rendering Functions
+  function renderProducts(filteredList) {
+    if (filteredList.length === 0) {
+      productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No matching products discovered.</p>`;
+      return;
     }
-
-    const category = categorySelect.value;
-    if (category !== "all") {
-      result = result.filter((p) => p.category === category);
-    }
-
-    const sort = sortSelect.value;
-    if (sort === "price-asc") result.sort((a, b) => a.price - b.price);
-    if (sort === "price-desc") result.sort((a, b) => b.price - a.price);
-    if (sort === "rating-desc") result.sort((a, b) => b.rating - a.rating);
-
-    return result;
-  }
-
-  function renderProducts() {
-    const products = getFilteredProducts();
-    productGrid.innerHTML = "";
-
-    if (products.length === 0) {
-      noResults.classList.remove("hidden");
-    } else {
-      noResults.classList.add("hidden");
-    }
-
-    products.forEach((product) => {
-      const card = document.createElement("div");
-      card.className = "product-card";
-      card.innerHTML = `
-        <img src="${product.image}" alt="${product.title}" loading="lazy" />
+    productGrid.innerHTML = filteredList.map(p => `
+      <article class="product-card">
+        <div class="product-img-wrapper">${p.icon}</div>
         <div class="product-info">
-          <span class="product-category">${product.category}</span>
-          <h3>${product.title}</h3>
-          <p class="product-desc">${product.description}</p>
-          <div class="product-rating">${renderStars(product.rating)} <span>(${product.rating})</span></div>
+          <span class="product-category">${p.category}</span>
+          <h3 class="product-title">${p.name}</h3>
+          <p class="product-rating">⭐ ${p.rating} <span>(${Math.floor(p.rating * 15)} reviews)</span></p>
           <div class="product-footer">
-            <span class="product-price">${formatCurrency(product.price)}</span>
-            <button class="btn-add-cart" data-id="${product.id}">Add to Cart</button>
+            <span class="product-price">$${p.price.toFixed(2)}</span>
+            <button class="btn btn-primary add-to-cart-btn" data-id="${p.id}">Add to Cart</button>
           </div>
         </div>
-      `;
-      productGrid.appendChild(card);
-    });
+      </article>
+    `).join("");
   }
 
-  // ---------- Cart UI ----------
-  function refreshCartUI() {
-    const items = Cart.getItems();
-    const totalCount = Cart.getTotalCount();
-    const subtotal = Cart.getSubtotal();
+  function renderCart() {
+    const list = Cart.getItems();
+    cartCountBadge.textContent = Cart.getCount();
+    cartSubtotalText.textContent = `$${Cart.getTotal().toFixed(2)}`;
 
-    cartCount.textContent = totalCount;
-    cartCount.classList.toggle("hidden", totalCount === 0);
-
-    cartItemsContainer.innerHTML = "";
-
-    if (items.length === 0) {
-      cartEmptyMsg.classList.remove("hidden");
+    if (list.length === 0) {
+      cartItemsContainer.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:30px 0;">Your shopping cart is empty.</p>`;
       checkoutBtn.disabled = true;
-    } else {
-      cartEmptyMsg.classList.add("hidden");
-      checkoutBtn.disabled = false;
+      return;
+    }
 
-      items.forEach((item) => {
-        const row = document.createElement("div");
-        row.className = "cart-item";
-        row.innerHTML = `
-          <img src="${item.image}" alt="${item.title}" />
-          <div class="cart-item-info">
-            <h4>${item.title}</h4>
-            <span>${formatCurrency(item.price)}</span>
-          </div>
+    checkoutBtn.disabled = false;
+    cartItemsContainer.innerHTML = list.map(item => `
+      <div class="cart-item">
+        <div class="cart-item-img">${item.icon}</div>
+        <div class="cart-item-details">
+          <h4 class="cart-item-title">${item.name}</h4>
+          <span class="cart-item-price">$${item.price.toFixed(2)}</span>
           <div class="cart-item-qty">
-            <button class="qty-btn" data-action="decrease" data-id="${item.id}">−</button>
-            <span>${item.qty}</span>
-            <button class="qty-btn" data-action="increase" data-id="${item.id}">+</button>
+            <button class="btn-qty qty-minus" data-id="${item.id}">-</button>
+            <span>${item.quantity}</span>
+            <button class="btn-qty qty-plus" data-id="${item.id}">+</button>
           </div>
-          <button class="remove-btn" data-id="${item.id}" title="Remove">🗑</button>
-        `;
-        cartItemsContainer.appendChild(row);
-      });
-    }
-
-    cartSubtotal.textContent = formatCurrency(subtotal);
-    checkoutTotal.textContent = formatCurrency(subtotal);
+        </div>
+        <button class="btn-remove" data-id="${item.id}" aria-label="Remove item">🗑️</button>
+      </div>
+    `).join("");
   }
 
-  function openCart() {
-    cartDrawer.classList.add("open");
-    cartOverlay.classList.add("show");
-  }
+  // Filtration Processing Orchestration Pipeline
+  function processCatalogState() {
+    let query = searchInput.value.toLowerCase().trim();
+    let catSelection = categoryFilter.value;
+    let sortType = sortSelect.value;
 
-  function closeCart() {
-    cartDrawer.classList.remove("open");
-    cartOverlay.classList.remove("show");
-  }
-
-  // ---------- Checkout ----------
-  function openCheckout() {
-    if (Cart.getItems().length === 0) return;
-    checkoutForm.classList.remove("hidden");
-    confirmationView.classList.add("hidden");
-    checkoutModal.classList.add("open");
-    checkoutOverlay.classList.add("show");
-  }
-
-  function closeCheckout() {
-    checkoutModal.classList.remove("open");
-    checkoutOverlay.classList.remove("show");
-  }
-
-  function validateCheckoutForm(formData) {
-    const errors = {};
-
-    if (!formData.get("name").trim()) {
-      errors.name = "Full name is required";
-    }
-
-    const email = formData.get("email").trim();
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      errors.email = "Email is required";
-    } else if (!emailPattern.test(email)) {
-      errors.email = "Enter a valid email address";
-    }
-
-    const phone = formData.get("phone").trim();
-    if (!phone) {
-      errors.phone = "Phone number is required";
-    } else if (!/^\d{10}$/.test(phone)) {
-      errors.phone = "Enter a valid 10-digit phone number";
-    }
-
-    if (!formData.get("address").trim()) {
-      errors.address = "Delivery address is required";
-    }
-
-    return errors;
-  }
-
-  function showFieldErrors(errors) {
-    document.querySelectorAll(".field-error").forEach((el) => (el.textContent = ""));
-    Object.entries(errors).forEach(([field, message]) => {
-      const el = document.querySelector(`.field-error[data-field="${field}"]`);
-      if (el) el.textContent = message;
+    let result = products.filter(p => {
+      const matchSearch = p.name.toLowerCase().includes(query) || p.description.toLowerCase().includes(query);
+      const matchCat = catSelection === "all" || p.category === catSelection;
+      return matchSearch && matchCat;
     });
+
+    if (sortType === "price-low") result.sort((a, b) => a.price - b.price);
+    else if (sortType === "price-high") result.sort((a, b) => b.price - a.price);
+    else if (sortType === "rating") result.sort((a, b) => b.rating - a.rating);
+
+    renderProducts(result);
   }
 
-  // ---------- Event listeners ----------
-  searchInput.addEventListener("input", renderProducts);
-  categorySelect.addEventListener("change", renderProducts);
-  sortSelect.addEventListener("change", renderProducts);
+  // Toast Messaging System Component
+  function displayToast(msg) {
+    const box = document.getElementById("toast-container");
+    const element = document.createElement("div");
+    element.className = "toast";
+    element.textContent = msg;
+    box.appendChild(element);
+    setTimeout(() => element.remove(), 3000);
+  }
 
+  // Input Error Form Validation Assertions
+  function markValidity(element, isValid, message = "") {
+    const group = element.closest(".form-group");
+    const errorDisplay = group.querySelector(".error-msg");
+    if (isValid) {
+      group.classList.remove("invalid");
+      errorDisplay.textContent = "";
+    } else {
+      group.classList.add("invalid");
+      errorDisplay.textContent = message;
+    }
+  }
+
+  // Event Routing Wireframes
+  themeToggle.addEventListener("click", () => {
+    const active = document.body.classList.toggle("dark-theme");
+    localStorage.setItem("dark-theme", active);
+  });
+
+  searchInput.addEventListener("input", processCatalogState);
+  categoryFilter.addEventListener("change", processCatalogState);
+  sortSelect.addEventListener("change", processCatalogState);
+
+  cartBtn.addEventListener("click", () => cartDrawer.classList.add("open"));
+  closeCart.addEventListener("click", () => cartDrawer.classList.remove("open"));
+
+  // Delegated Event Hub Operations
   productGrid.addEventListener("click", (e) => {
-    const btn = e.target.closest(".btn-add-cart");
-    if (!btn) return;
-
-    const productId = Number(btn.dataset.id);
-    const product = PRODUCTS.find((p) => p.id === productId);
-    Cart.addItem(product);
-    refreshCartUI();
-    showToast(`${product.title} added to cart`);
+    if (e.target.classList.contains("add-to-cart-btn")) {
+      const id = parseInt(e.target.getAttribute("data-id"));
+      const match = products.find(p => p.id === id);
+      if (match) {
+        Cart.addItem(match);
+        displayToast(`Added ${match.name} to cart!`);
+      }
+    }
   });
 
-  cartIcon.addEventListener("click", openCart);
-  closeCartBtn.addEventListener("click", closeCart);
-  cartOverlay.addEventListener("click", closeCart);
+  cartDrawer.addEventListener("click", (e) => {
+    const id = parseInt(e.target.getAttribute("data-id"));
+    if (!id) return;
 
-  cartItemsContainer.addEventListener("click", (e) => {
-    const qtyBtn = e.target.closest(".qty-btn");
-    const removeBtn = e.target.closest(".remove-btn");
-
-    if (qtyBtn) {
-      const id = Number(qtyBtn.dataset.id);
-      const items = Cart.getItems();
-      const item = items.find((i) => i.id === id);
-      if (!item) return;
-
-      const newQty = qtyBtn.dataset.action === "increase" ? item.qty + 1 : item.qty - 1;
-      Cart.updateQty(id, newQty);
-      refreshCartUI();
-    }
-
-    if (removeBtn) {
-      const id = Number(removeBtn.dataset.id);
+    if (e.target.classList.contains("qty-plus")) Cart.updateQuantity(id, 1);
+    else if (e.target.classList.contains("qty-minus")) Cart.updateQuantity(id, -1);
+    else if (e.target.classList.contains("btn-remove")) {
+      const targetItem = Cart.getItems().find(i => i.id === id);
       Cart.removeItem(id);
-      refreshCartUI();
-      showToast("Item removed from cart");
+      if (targetItem) displayToast(`Removed ${targetItem.name} from cart.`);
     }
   });
 
+  document.addEventListener("cartUpdated", renderCart);
+
+  // Modal Checkout Form Workflow System Hooks
   checkoutBtn.addEventListener("click", () => {
-    closeCart();
-    openCheckout();
+    cartDrawer.classList.remove("open");
+    checkoutModal.classList.add("open");
   });
 
-  closeCheckoutBtn.addEventListener("click", closeCheckout);
-  checkoutOverlay.addEventListener("click", closeCheckout);
+  closeModal.addEventListener("click", () => checkoutModal.classList.remove("open"));
 
   checkoutForm.addEventListener("submit", (e) => {
     e.preventDefault();
-    const formData = new FormData(checkoutForm);
-    const errors = validateCheckoutForm(formData);
+    let formValid = true;
 
-    showFieldErrors(errors);
-    if (Object.keys(errors).length > 0) return;
+    const nameNode = document.getElementById("full-name");
+    if (!nameNode.value.trim()) {
+      markValidity(nameNode, false, "Full name field is required.");
+      formValid = false;
+    } else markValidity(nameNode, true);
 
-    // "Place order": generate a mock order ID, clear cart, show confirmation
-    const orderId = "SE" + Math.floor(100000 + Math.random() * 900000);
-    orderIdSpan.textContent = orderId;
+    const emailNode = document.getElementById("email");
+    const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!mailRegex.test(emailNode.value.trim())) {
+      markValidity(emailNode, false, "Enter a valid email structure.");
+      formValid = false;
+    } else markValidity(emailNode, true);
 
-    checkoutForm.classList.add("hidden");
-    confirmationView.classList.remove("hidden");
+    const phoneNode = document.getElementById("phone");
+    if (!/^\d{10}$/.test(phoneNode.value.trim())) {
+      markValidity(phoneNode, false, "Phone must span exactly 10 digital numbers.");
+      formValid = false;
+    } else markValidity(phoneNode, true);
 
-    Cart.clear();
-    refreshCartUI();
-    checkoutForm.reset();
-  });
+    const addressNode = document.getElementById("address");
+    if (!addressNode.value.trim()) {
+      markValidity(addressNode, false, "Shipping delivery address required.");
+      formValid = false;
+    } else markValidity(addressNode, true);
 
-  // ---------- Dark mode ----------
-  function applyDarkModePreference() {
-    const saved = localStorage.getItem("shopease_theme");
-    if (saved === "dark") {
-      document.body.classList.add("dark");
-      darkModeToggle.checked = true;
+    if (formValid) {
+      checkoutModal.classList.remove("open");
+      summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
+      confirmationModal.classList.add("open");
+      Cart.clear();
+      checkoutForm.reset();
     }
-  }
-
-  darkModeToggle.addEventListener("change", () => {
-    document.body.classList.toggle("dark", darkModeToggle.checked);
-    localStorage.setItem("shopease_theme", darkModeToggle.checked ? "dark" : "light");
   });
 
-  // ---------- Init ----------
-  applyDarkModePreference();
-  renderProducts();
-  refreshCartUI();
+  closeConfirmation.addEventListener("click", () => confirmationModal.classList.remove("open"));
+
+  // Structural Setup Boot Execution Run
+  renderProducts(products);
+  renderCart();
 });
