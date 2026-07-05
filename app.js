@@ -211,7 +211,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // Dynamic ZIP Code Lookup API Integration
+  // Dynamic ZIP Code Autocomplete API Logic
   const pinNode = document.getElementById("pincode");
   const stateNode = document.getElementById("state");
 
@@ -222,10 +222,15 @@ window.addEventListener("load", () => {
       if (/^\d{5}$/.test(zip)) {
         try {
           const response = await fetch(`https://api.zippopotam.us/us/${zip}`);
-          if (!response.ok) return;
+          if (!response.ok) {
+            markValidity(pinNode, false, "Invalid ZIP code structure or region.");
+            return;
+          }
 
           const data = await response.json();
           const places = data.places;
+
+          markValidity(pinNode, true);
 
           if (stateNode && places.length > 0) {
             stateNode.value = places[0]["state abbreviation"];
@@ -246,7 +251,11 @@ window.addEventListener("load", () => {
               
               selectDropdown.innerHTML = optionsHtml;
               cityNode.replaceWith(selectDropdown);
-              markValidity(selectDropdown, true);
+              
+              // Bind a validity clearance wrapper on selection changes
+              selectDropdown.addEventListener("change", () => {
+                if(selectDropdown.value) markValidity(selectDropdown, true);
+              });
             } else {
               ensureCityIsTextInput();
               const updatedCityNode = document.getElementById("city");
@@ -255,7 +264,7 @@ window.addEventListener("load", () => {
             }
           }
         } catch (error) {
-          console.error("ZIP code architecture lookup encountered an anomaly:", error);
+          console.error("ZIP code API transaction encountered an anomaly:", error);
         }
       }
     });
@@ -314,16 +323,16 @@ window.addEventListener("load", () => {
         formValid = false;
       } else if (stateNode) markValidity(stateNode, true);
 
-      const pinNode = document.getElementById("pincode");
-      if (pinNode && !pinNode.value.trim()) {
-        markValidity(pinNode, false, "Pin Code is required.");
+      const currentPinNode = document.getElementById("pincode");
+      if (currentPinNode && !currentPinNode.value.trim()) {
+        markValidity(currentPinNode, false, "Pin Code is required.");
         formValid = false;
-      } else if (pinNode) markValidity(pinNode, true);
+      } else if (currentPinNode) markValidity(currentPinNode, true);
 
       if (formValid) {
         if (summaryOrderId) summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
         if (confirmationModal) confirmationModal.classList.add("open");
-        ensureCityIsTextInput(); // Ensure form resets safely to default text input structure
+        ensureCityIsTextInput(); 
         Cart.clear();
         checkoutForm.reset();
       }
@@ -336,6 +345,25 @@ window.addEventListener("load", () => {
       navigateToStep(1);
     });
   }
+
+  // Home Button / Go Back Utility Setup
+  const logoElement = document.querySelector(".logo");
+  if (logoElement) {
+    logoElement.style.cursor = "pointer";
+    logoElement.addEventListener("click", () => {
+      // Directs the interface back to Step 1 seamlessly
+      navigateToStep(1);
+    });
+  }
+
+  // Fallback programmatic historical back router utility if needed explicitly
+  window.goBackToPreviousWebsite = () => {
+    if (document.referrer) {
+      window.location.href = document.referrer;
+    } else {
+      window.history.back();
+    }
+  };
 
   const initialProducts = typeof products !== 'undefined' ? products : [];
   renderProducts(initialProducts);
