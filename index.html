@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopEase — Multi-Step E-commerce Catalog</title>
-  <!-- Linked directly to root style.css to prevent folder bugs -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -41,7 +40,6 @@
         <h2>Available Products</h2>
       </div>
       
-      <!-- Toolbar Filtering System Controls -->
       <div class="toolbar">
         <input type="text" id="search-input" placeholder="Search products..." autocomplete="off">
         <select id="category-filter">
@@ -59,7 +57,6 @@
         </select>
       </div>
 
-      <!-- Dynamic Rendering Target Product Grid -->
       <div id="product-grid" class="product-grid"></div>
     </section>
 
@@ -106,10 +103,34 @@
           <input type="tel" id="phone" placeholder="1234567890">
           <span class="error-msg"></span>
         </div>
+        
+        <!-- Expanded Address Block Requirements -->
         <div class="form-group">
-          <label for="address">Shipping Address</label>
-          <textarea id="address" rows="3" placeholder="123 Main St, Apt 4B..."></textarea>
+          <label for="address-1">Address Line 1</label>
+          <input type="text" id="address-1" placeholder="Street address, P.O. box, company name">
           <span class="error-msg"></span>
+        </div>
+        <div class="form-group">
+          <label for="address-2">Address Line 2 (Optional)</label>
+          <input type="text" id="address-2" placeholder="Apartment, suite, unit, building, floor">
+          <span class="error-msg"></span>
+        </div>
+        <div class="form-row-grid">
+          <div class="form-group">
+            <label for="city">City</label>
+            <input type="text" id="city" placeholder="New York">
+            <span class="error-msg"></span>
+          </div>
+          <div class="form-group">
+            <label for="state">State</label>
+            <input type="text" id="state" placeholder="NY">
+            <span class="error-msg"></span>
+          </div>
+          <div class="form-group">
+            <label for="pincode">Pin Code</label>
+            <input type="text" id="pincode" placeholder="10001">
+            <span class="error-msg"></span>
+          </div>
         </div>
 
         <div class="step-navigation-buttons">
@@ -121,7 +142,7 @@
 
   </main>
 
-  <!-- CONFIRMATION MODAL SYSTEM OVERLAY (Removed 'open' class safely) -->
+  <!-- CONFIRMATION MODAL SYSTEM OVERLAY -->
   <div id="confirmation-modal" class="modal">
     <div class="modal-content">
       <div class="success-icon">🎉</div>
@@ -134,10 +155,8 @@
     </div>
   </div>
 
-  <!-- Toast Notification Dynamic Engine Port -->
   <div id="toast-container" class="toast-container"></div>
 
-  <!-- Script Pipeline Hooks explicitly loaded from the root folder -->
   <script src="products.js"></script>
   <script src="cart.js"></script>
   <script src="app.js"></script>
