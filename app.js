@@ -211,6 +211,67 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
+  // Dynamic ZIP Code Lookup API Integration
+  const pinNode = document.getElementById("pincode");
+  const stateNode = document.getElementById("state");
+
+  if (pinNode) {
+    pinNode.addEventListener("input", async (e) => {
+      const zip = e.target.value.trim();
+      
+      if (/^\d{5}$/.test(zip)) {
+        try {
+          const response = await fetch(`https://api.zippopotam.us/us/${zip}`);
+          if (!response.ok) return;
+
+          const data = await response.json();
+          const places = data.places;
+
+          if (stateNode && places.length > 0) {
+            stateNode.value = places[0]["state abbreviation"];
+            markValidity(stateNode, true);
+          }
+
+          const cityNode = document.getElementById("city");
+          if (cityNode && places.length > 0) {
+            if (places.length > 1) {
+              const selectDropdown = document.createElement("select");
+              selectDropdown.id = "city";
+              
+              let optionsHtml = `<option value="">Select Nearby City</option>`;
+              places.forEach(place => {
+                const cityName = place["place name"];
+                optionsHtml += `<option value="${cityName}">${cityName}</option>`;
+              });
+              
+              selectDropdown.innerHTML = optionsHtml;
+              cityNode.replaceWith(selectDropdown);
+              markValidity(selectDropdown, true);
+            } else {
+              ensureCityIsTextInput();
+              const updatedCityNode = document.getElementById("city");
+              updatedCityNode.value = places[0]["place name"];
+              markValidity(updatedCityNode, true);
+            }
+          }
+        } catch (error) {
+          console.error("ZIP code architecture lookup encountered an anomaly:", error);
+        }
+      }
+    });
+  }
+
+  function ensureCityIsTextInput() {
+    const currentCityField = document.getElementById("city");
+    if (currentCityField && currentCityField.tagName === "SELECT") {
+      const textInput = document.createElement("input");
+      textInput.type = "text";
+      textInput.id = "city";
+      textInput.placeholder = "New York";
+      currentCityField.replaceWith(textInput);
+    }
+  }
+
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -243,7 +304,7 @@ window.addEventListener("load", () => {
 
       const cityNode = document.getElementById("city");
       if (cityNode && !cityNode.value.trim()) {
-        markValidity(cityNode, false, "City field is required.");
+        markValidity(cityNode, false, "City selection or input is required.");
         formValid = false;
       } else if (cityNode) markValidity(cityNode, true);
 
@@ -262,6 +323,7 @@ window.addEventListener("load", () => {
       if (formValid) {
         if (summaryOrderId) summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
         if (confirmationModal) confirmationModal.classList.add("open");
+        ensureCityIsTextInput(); // Ensure form resets safely to default text input structure
         Cart.clear();
         checkoutForm.reset();
       }
