@@ -34,8 +34,8 @@
 
   <main class="container">
     
-    <!-- STEP 1: PRODUCT CATALOG ARCHITECTURE -->
-    <section id="step-1" class="wizard-step">
+    <!-- STEP 1: PRODUCT CATALOG ARCHITECTURE (Active by default) -->
+    <section id="step-1" class="wizard-step active">
       <div class="step-header">
         <h2>Available Products</h2>
       </div>
@@ -60,7 +60,7 @@
       <div id="product-grid" class="product-grid"></div>
     </section>
 
-    <!-- STEP 2: SHOPPING CART OVERVIEW -->
+    <!-- STEP 2: SHOPPING CART OVERVIEW (Hidden by default) -->
     <section id="step-2" class="wizard-step">
       <div class="step-header">
         <h2>Your Shopping Cart</h2>
@@ -81,7 +81,7 @@
       </div>
     </section>
 
-    <!-- STEP 3: SECURE CHECKOUT OUTLINE -->
+    <!-- STEP 3: SECURE CHECKOUT OUTLINE (Hidden by default) -->
     <section id="step-3" class="wizard-step">
       <div class="step-header">
         <h2>Shipping & Checkout</h2>
@@ -104,15 +104,15 @@
           <span class="error-msg"></span>
         </div>
         
-        <!-- Expanded Address Block Requirements -->
+        <!-- Address Form breakdown fields -->
         <div class="form-group">
           <label for="address-1">Address Line 1</label>
-          <input type="text" id="address-1" placeholder="Street address, P.O. box, company name">
+          <input type="text" id="address-1" placeholder="Street address, P.O. box">
           <span class="error-msg"></span>
         </div>
         <div class="form-group">
           <label for="address-2">Address Line 2 (Optional)</label>
-          <input type="text" id="address-2" placeholder="Apartment, suite, unit, building, floor">
+          <input type="text" id="address-2" placeholder="Apartment, suite, unit, building">
           <span class="error-msg"></span>
         </div>
         <div class="form-row-grid">
