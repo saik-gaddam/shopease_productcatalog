@@ -55,10 +55,10 @@ body {
 
 /* WIZARD MULTI-PAGE VIEW MECHANICS */
 .wizard-step {
-  display: none; /* Keeps steps hidden until triggered */
+  display: none; 
 }
 .wizard-step.active {
-  display: block; /* Reveals only active step */
+  display: block; 
 }
 
 /* Step Progress Header Bar Component */
