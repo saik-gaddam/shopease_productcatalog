@@ -40,7 +40,7 @@ body {
   position: sticky; top: 0; z-index: 100; padding: 15px 0;
 }
 .header-inner { display: flex; justify-content: space-between; align-items: center; }
-.logo { color: var(--primary); font-size: 1.4rem; }
+.logo { color: var(--primary); font-size: 1.4rem; font-weight: 700; }
 .header-actions { display: flex; gap: 15px; align-items: center; }
 
 .btn-icon {
@@ -55,23 +55,23 @@ body {
 
 /* WIZARD MULTI-PAGE VIEW MECHANICS */
 .wizard-step {
-  display: none; /* Crucial: Keeps all steps invisible by default */
+  display: none; /* Keeps steps hidden until triggered */
 }
 .wizard-step.active {
-  display: block; /* Reveals only the targeted active view step */
+  display: block; /* Reveals only active step */
 }
 
 /* Step Progress Header Bar Component */
 .wizard-progress-container { margin-top: 25px; }
 .wizard-progress {
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
   background-color: var(--bg-card); padding: 15px; border-radius: var(--radius);
   border: 1px solid var(--border-color); box-shadow: var(--shadow);
 }
 .progress-step {
   display: flex; flex-direction: column; align-items: center;
   font-weight: bold; font-size: 0.9rem; color: var(--text-muted); position: relative;
-  width: 70px;
+  width: 80px;
 }
 .progress-step.active { color: var(--primary); }
 .progress-step span { font-size: 0.75rem; margin-top: 4px; font-weight: normal; }
