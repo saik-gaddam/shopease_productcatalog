@@ -8,154 +8,151 @@
 </head>
 <body>
 
-  <!-- Header Section -->
-  <header class="header">
-    <div class="container header-inner">
+  <!-- Header Layout Elements -->
+  <header class="app-header">
+    <div class="header-container">
       <h1 class="logo">ShopEase</h1>
       <div class="header-actions">
-        <button id="theme-toggle" class="btn-icon" aria-label="Toggle Theme">🌓</button>
-        <button id="cart-nav-btn" class="btn-icon" aria-label="View Cart">
-          🛒 <span id="cart-count" class="cart-badge">0</span>
+        <button id="theme-toggle" class="btn-theme-toggle" aria-label="Toggle theme">🌓</button>
+        <button id="cart-nav-btn" class="btn btn-cart">
+          Shopping Cart <span id="cart-count" class="badge">0</span>
         </button>
       </div>
     </div>
   </header>
 
-  <!-- Multi-Step Progress Indicator Bar -->
-  <div class="container wizard-progress-container">
-    <nav class="wizard-progress">
-      <div class="progress-step active" id="badge-step-1">1 <span>Products</span></div>
-      <div class="progress-line"></div>
-      <div class="progress-step" id="badge-step-2">2 <span>Your Cart</span></div>
-      <div class="progress-line"></div>
-      <div class="progress-step" id="badge-step-3">3 <span>Checkout</span></div>
-    </nav>
-  </div>
-
-  <main class="container">
-    
-    <!-- STEP 1: PRODUCT CATALOG ARCHITECTURE (Active by default) -->
-    <section id="step-1" class="wizard-step active">
-      <div class="step-header">
-        <h2>Available Products</h2>
-      </div>
-      
-      <div class="toolbar">
-        <input type="text" id="search-input" placeholder="Search products..." autocomplete="off">
-        <select id="category-filter">
-          <option value="all">All Categories</option>
-          <option value="clothing">Clothing</option>
-          <option value="electronics">Electronics</option>
-          <option value="books">Books</option>
-          <option value="home & kitchen">Home & Kitchen</option>
-        </select>
-        <select id="sort-select">
-          <option value="default">Sort By</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="rating">Top Rated</option>
-        </select>
-      </div>
-
-      <div id="product-grid" class="product-grid"></div>
-    </section>
-
-    <!-- STEP 2: SHOPPING CART OVERVIEW (Hidden by default) -->
-    <section id="step-2" class="wizard-step">
-      <div class="step-header">
-        <h2>Your Shopping Cart</h2>
-      </div>
-      
-      <div id="cart-items" class="cart-items-wrapper"></div>
-      
-      <div class="cart-summary-box">
-        <div class="cart-summary-row">
-          <span>Subtotal:</span>
-          <span id="cart-subtotal">$0.00</span>
-        </div>
-      </div>
-
-      <div class="step-navigation-buttons">
-        <button class="btn btn-secondary prev-step-btn" data-target="1">Back to Shop</button>
-        <button id="checkout-btn" class="btn btn-primary" disabled>Proceed to Checkout</button>
-      </div>
-    </section>
-
-    <!-- STEP 3: SECURE CHECKOUT OUTLINE (Hidden by default) -->
-    <section id="step-3" class="wizard-step">
-      <div class="step-header">
-        <h2>Shipping & Checkout</h2>
-      </div>
-      
-      <form id="checkout-form" class="checkout-wizard-form" novalidate>
-        <div class="form-group">
-          <label for="full-name">Full Name</label>
-          <input type="text" id="full-name" placeholder="John Doe">
-          <span class="error-msg"></span>
-        </div>
-        <div class="form-group">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" placeholder="john@example.com">
-          <span class="error-msg"></span>
-        </div>
-        <div class="form-group">
-          <label for="phone">Phone Number (10 digits)</label>
-          <input type="tel" id="phone" placeholder="1234567890">
-          <span class="error-msg"></span>
-        </div>
-        
-        <!-- Address Form breakdown fields -->
-        <div class="form-group">
-          <label for="address-1">Address Line 1</label>
-          <input type="text" id="address-1" placeholder="Street address, P.O. box">
-          <span class="error-msg"></span>
-        </div>
-        <div class="form-group">
-          <label for="address-2">Address Line 2 (Optional)</label>
-          <input type="text" id="address-2" placeholder="Apartment, suite, unit, building">
-          <span class="error-msg"></span>
-        </div>
-        <div class="form-row-grid">
-          <div class="form-group">
-            <label for="city">City</label>
-            <input type="text" id="city" placeholder="New York">
-            <span class="error-msg"></span>
-          </div>
-          <div class="form-group">
-            <label for="state">State</label>
-            <input type="text" id="state" placeholder="NY">
-            <span class="error-msg"></span>
-          </div>
-          <div class="form-group">
-            <label for="pincode">Pin Code</label>
-            <input type="text" id="pincode" placeholder="10001">
-            <span class="error-msg"></span>
-          </div>
-        </div>
-
-        <div class="step-navigation-buttons">
-          <button type="button" class="btn btn-secondary prev-step-btn" data-target="2">Back to Cart</button>
-          <button type="submit" class="btn btn-success">Place Order</button>
-        </div>
-      </form>
-    </section>
-
-  </main>
-
-  <!-- CONFIRMATION MODAL SYSTEM OVERLAY -->
-  <div id="confirmation-modal" class="modal">
-    <div class="modal-content">
-      <div class="success-icon">🎉</div>
-      <h2>Order Confirmed!</h2>
-      <p>Thank you for shopping with ShopEase. Your order has been placed successfully.</p>
-      <div class="order-id-box">
-        Order ID: <strong id="summary-order-id">#000000</strong>
-      </div>
-      <button id="close-confirmation" class="btn btn-primary">Continue Shopping</button>
+  <!-- Progress Bar Framework Tracker -->
+  <div class="progress-bar-wrapper">
+    <div class="progress-steps-container">
+      <div class="progress-step active" data-step="1">1. Choose Products</div>
+      <div class="progress-step" data-step="2">2. Review Cart</div>
+      <div class="progress-step" data-step="3">3. Billing Details</div>
     </div>
   </div>
 
-  <div id="toast-container" class="toast-container"></div>
+  <!-- Wizard Application Windows -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- STEP 1: CATALOG OVERVIEW -->
+      <section id="step-1" class="wizard-step active">
+        <!-- Running Carousel Banner Framework Container -->
+        <div class="banner-carousel-wrapper">
+          <div id="hero-banner-carousel" class="banner-carousel"></div>
+        </div>
+
+        <div class="catalog-controls">
+          <div class="search-box">
+            <input type="text" id="search-input" placeholder="Search products by title...">
+          </div>
+          <div class="filter-sort-group">
+            <div class="filter-box">
+              <select id="category-filter">
+                <option value="all">All Categories</option>
+                <option value="clothing">Clothing</option>
+                <option value="electronics">Electronics</option>
+                <option value="books">Books</option>
+                <option value="home">Home</option>
+              </select>
+            </div>
+            <div class="sort-box">
+              <select id="sort-select">
+                <option value="default">Sort Options</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="rating">Top Customer Ratings</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="product-grid" class="products-grid"></div>
+      </section>
+
+      <!-- STEP 2: BASKET BREAKDOWN -->
+      <section id="step-2" class="wizard-step">
+        <h2 class="section-title">Your Selected Items</h2>
+        <div class="cart-layout">
+          <div id="cart-items" class="cart-items-list"></div>
+          <div class="cart-summary-card">
+            <h3>Order Subtotal</h3>
+            <div class="summary-row">
+              <span>Estimated Subtotal:</span>
+              <span id="cart-subtotal" class="total-price">$0.00</span>
+            </div>
+            <div class="summary-actions">
+              <button class="btn btn-secondary prev-step-btn" data-target="1">Return to Shop</button>
+              <button id="checkout-btn" class="btn btn-primary" disabled>Proceed to Checkout</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3: CUSTOMER CHECKOUT -->
+      <section id="step-3" class="wizard-step">
+        <h2 class="section-title">Shipping & Settlement Details</h2>
+        <div class="checkout-form-container">
+          <form id="checkout-form" novalidate>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="full-name">Full Name *</label>
+                <input type="text" id="full-name" required placeholder="John Doe">
+                <span class="error-msg"></span>
+              </div>
+              <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" required placeholder="john@example.com">
+                <span class="error-msg"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="address-1">Street Address Line 1 *</label>
+              <input type="text" id="address-1" required placeholder="Enter street name and house number">
+              <span class="error-msg"></span>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City *</label>
+                <input type="text" id="city" required placeholder="City name">
+                <span class="error-msg"></span>
+              </div>
+              <div class="form-group">
+                <label for="state">State *</label>
+                <input type="text" id="state" required placeholder="State initials">
+                <span class="error-msg"></span>
+              </div>
+              <div class="form-group">
+                <label for="pincode">PIN / Postal Code *</label>
+                <input type="text" id="pincode" required placeholder="ZIP Code">
+                <span class="error-msg"></span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" class="btn btn-secondary prev-step-btn" data-target="2">Back to Cart</button>
+              <button type="submit" class="btn btn-success">Complete Purchase</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="toast-wrapper"></div>
+
+  <!-- Final Confirmation Success Modal Box -->
+  <div id="confirmation-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="success-icon">🎉</div>
+      <h2>Order Placed Successfully!</h2>
+      <p>Thank you for shopping with ShopEase. Your transaction receipt reference number is <strong id="summary-order-id">#SE000000</strong>.</p>
+      <button id="close-confirmation" class="btn btn-primary">Continue Shopping</button>
+    </div>
+  </div>
 
   <script src="products.js"></script>
   <script src="cart.js"></script>
