@@ -105,13 +105,14 @@ window.addEventListener("load", () => {
   // Filtering System Pipelines
   function processCatalogState() {
     let query = searchInput ? searchInput.value.toLowerCase().trim() : "";
-    let catSelection = categoryFilter ? categoryFilter.value : "all";
+    // Normalizes uppercase filter dropdown entries to case-insensitive match products array entries safely
+    let catSelection = categoryFilter ? categoryFilter.value.toLowerCase() : "all";
     let sortType = sortSelect ? sortSelect.value : "default";
 
     const productData = typeof products !== 'undefined' ? products : [];
 
     let result = productData.filter(p => {
-      const matchSearch = p.name.toLowerCase().includes(query) || (p.description && p.description.toLowerCase().includes(query));
+      const matchSearch = p.name.toLowerCase().includes(query);
       const matchCat = catSelection === "all" || p.category === catSelection;
       return matchSearch && matchCat;
     });
