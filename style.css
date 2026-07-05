@@ -255,7 +255,7 @@ body.dark-theme .product-img-wrapper {
 .cart-drawer {
   position: fixed;
   top: 0;
-  right: -400px;
+  right: -400px; /* Kept hidden off-screen to the right initially */
   width: 100%;
   max-width: 400px;
   height: 100%;
@@ -269,7 +269,7 @@ body.dark-theme .product-img-wrapper {
 }
 
 .cart-drawer.open {
-  right: 0;
+  right: 0; /* Pulled smoothly into viewport when cart is opened */
 }
 
 .drawer-header {
@@ -374,14 +374,14 @@ body.dark-theme .product-img-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0;               /* Fully transparent on initial build */
+  pointer-events: none;     /* Ignores clicks while hidden */
   transition: opacity 0.2s ease;
 }
 
 .modal.open {
-  opacity: 1;
-  pointer-events: auto;
+  opacity: 1;               /* Fades into active presence */
+  pointer-events: auto;     /* Re-enables interaction inputs */
 }
 
 .modal-content {
