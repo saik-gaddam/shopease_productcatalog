@@ -1,4 +1,3 @@
-// Global Application Case-Insensitive Product Database
 const products = [
   { id: 1, name: "Premium Cotton Hoodie", category: "clothing", price: 49.99, rating: 4.6, icon: "🧥" },
   { id: 2, name: "Wireless Noise-Canceling Headphones", category: "electronics", price: 199.99, rating: 4.8, icon: "🎧" },
