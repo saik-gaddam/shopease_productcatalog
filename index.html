@@ -40,7 +40,6 @@
 
       <!-- STEP 1: CATALOG GRID AND HERO CAROUSEL -->
       <section id="step-1" class="wizard-step active">
-        <!-- Running Hero Carousel Banner -->
         <div class="banner-carousel-wrapper">
           <div id="hero-banner-carousel" class="banner-carousel"></div>
         </div>
@@ -99,10 +98,18 @@
           <form id="checkout-form" novalidate>
             <div class="form-row">
               <div class="form-group">
-                <label for="full-name">Full Name *</label>
-                <input type="text" id="full-name" required placeholder="John Doe">
+                <label for="first-name">First Name *</label>
+                <input type="text" id="first-name" required placeholder="John">
                 <span class="error-msg"></span>
               </div>
+              <div class="form-group">
+                <label for="last-name">Last Name *</label>
+                <input type="text" id="last-name" required placeholder="Doe">
+                <span class="error-msg"></span>
+              </div>
+            </div>
+
+            <div class="form-row">
               <div class="form-group">
                 <label for="email">Email Address *</label>
                 <input type="email" id="email" required placeholder="john@example.com">
@@ -110,10 +117,10 @@
               </div>
             </div>
 
-            <!-- Google Maps API hooks into this target container -->
+            <!-- Street Address input field with dynamic dropdown overlay -->
             <div class="form-group" style="position: relative;">
               <label for="address-1">Street Address Line 1 *</label>
-              <input type="text" id="address-1" required placeholder="Enter street name and house number">
+              <input type="text" id="address-1" required placeholder="Enter street name and house number" autocomplete="off">
               <span class="error-msg"></span>
             </div>
 
@@ -159,7 +166,6 @@
     </div>
   </div>
 
-  <!-- Execution Dependencies -->
   <script src="products.js"></script>
   <script src="cart.js"></script>
   <script src="app.js"></script>
