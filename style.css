@@ -1,4 +1,3 @@
-/* Core Global Variables & Light Theme Defaults */
 :root {
   --primary: #4f46e5;
   --primary-hover: #4338ca;
@@ -33,7 +32,6 @@ body {
 
 .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-/* Header Elements */
 .header {
   background-color: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
@@ -53,15 +51,9 @@ body {
   width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
 }
 
-/* WIZARD MULTI-PAGE VIEW MECHANICS */
-.wizard-step {
-  display: none; 
-}
-.wizard-step.active {
-  display: block; 
-}
+.wizard-step { display: none; }
+.wizard-step.active { display: block; }
 
-/* Step Progress Header Bar Component */
 .wizard-progress-container { margin-top: 25px; }
 .wizard-progress {
   display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -76,13 +68,11 @@ body {
 .progress-step.active { color: var(--primary); }
 .progress-step span { font-size: 0.75rem; margin-top: 4px; font-weight: normal; }
 .progress-line { flex: 0.3; height: 3px; background-color: var(--border-color); margin-bottom: 15px; }
-.progress-step.active + .progress-line, .progress-line.filled { background-color: var(--primary); }
+.progress-step.active + .progress-line { background-color: var(--primary); }
 
-/* Navigation Buttons Group Container */
 .step-header { margin: 25px 0 15px 0; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
 .step-navigation-buttons { display: flex; justify-content: space-between; margin-top: 25px; gap: 15px; }
 
-/* Global Button Designs */
 .btn {
   padding: 12px 24px; border-radius: var(--radius); border: none;
   font-weight: 600; cursor: pointer; transition: var(--transition); text-align: center;
@@ -92,7 +82,6 @@ body {
 .btn-secondary { background-color: var(--border-color); color: var(--text-main); }
 .btn-success { background-color: var(--success); color: white; }
 
-/* Grid Layout Products Catalog */
 .toolbar { display: flex; gap: 15px; margin: 25px 0; flex-wrap: wrap; }
 .toolbar input, .toolbar select {
   padding: 10px 15px; border: 1px solid var(--border-color);
@@ -118,7 +107,6 @@ body.dark-theme .product-img-wrapper { background-color: #334155; }
 .product-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
 .product-price { font-size: 1.15rem; font-weight: 700; }
 
-/* Dedicated Checkout & Cart Views Layout styling */
 .cart-items-wrapper { background-color: var(--bg-card); border-radius: var(--radius); padding: 15px; border: 1px solid var(--border-color); }
 .cart-item { display: flex; gap: 15px; padding: 15px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
 .cart-item:last-child { border-bottom: none; }
@@ -137,44 +125,18 @@ body.dark-theme .product-img-wrapper { background-color: #334155; }
 .form-group.invalid input, .form-group.invalid textarea { border-color: #ef4444; }
 .error-msg { color: #ef4444; font-size: 0.8rem; display: block; margin-top: 2px; }
 
-/* Modal Confirmation Overlays styling */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
 .modal.open { opacity: 1; pointer-events: auto; }
 .modal-content { background: var(--bg-card); padding: 30px; border-radius: var(--radius); text-align: center; max-width: 450px; width: 100%; }
 .success-icon { font-size: 3.5rem; margin-bottom: 10px; }
 .order-id-box { background: var(--bg-main); padding: 10px; margin: 15px 0; border: 1px dashed var(--border-color); font-size: 1rem; }
 
-/* Toast Notifications Container */
 .toast-container { position: fixed; bottom: 20px; left: 20px; z-index: 3000; display: flex; flex-direction: column; gap: 10px; }
 .toast { background: #1f2937; color: white; padding: 12px 20px; border-radius: var(--radius); animation: slideIn 0.3s forwards, fadeOut 0.3s 2.7s forwards; }
 @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
-/* Custom Additions for Size Selectors and Checkout Form Rows */
-.product-size-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 8px 0;
-  font-size: 0.9rem;
-}
-.size-dropdown {
-  padding: 4px 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-card);
-  color: var(--text-main);
-  outline: none;
-  cursor: pointer;
-}
-.form-row-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 15px;
-}
-@media (max-width: 480px) {
-  .form-row-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-}
+.product-size-container { display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 0.9rem; }
+.size-dropdown { padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border-color); background-color: var(--bg-card); color: var(--text-main); outline: none; cursor: pointer; }
+.form-row-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; }
+@media (max-width: 480px) { .form-row-grid { grid-template-columns: 1fr; } }
