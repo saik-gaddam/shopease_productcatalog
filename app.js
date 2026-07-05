@@ -53,8 +53,8 @@ window.addEventListener("load", () => {
       return;
     }
     productGrid.innerHTML = filteredList.map(p => {
-      // Injects size selectors conditionally if product category is clothing
-      const isClothing = p.category.toLowerCase() === "clothing";
+      // Robust case-insensitive category check
+      const isClothing = p.category && p.category.toLowerCase().trim() === "clothing";
       const sizeSelectorHtml = isClothing ? `
         <div class="product-size-container">
           <label for="size-select-${p.id}">Size:</label>
@@ -118,14 +118,15 @@ window.addEventListener("load", () => {
 
   function processCatalogState() {
     let query = searchInput ? searchInput.value.toLowerCase().trim() : "";
-    let catSelection = categoryFilter ? categoryFilter.value.toLowerCase() : "all";
+    let catSelection = categoryFilter ? categoryFilter.value.toLowerCase().trim() : "all";
     let sortType = sortSelect ? sortSelect.value : "default";
 
     const productData = typeof products !== 'undefined' ? products : [];
 
     let result = productData.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(query);
-      const matchCat = catSelection === "all" || p.category === catSelection;
+      const pCat = p.category ? p.category.toLowerCase().trim() : "";
+      const matchCat = catSelection === "all" || pCat === catSelection;
       return matchSearch && matchCat;
     });
 
@@ -179,7 +180,8 @@ window.addEventListener("load", () => {
         
         if (match) {
           let selectedSize = null;
-          if (match.category.toLowerCase() === "clothing") {
+          // Bulletproof runtime category match
+          if (match.category && match.category.toLowerCase().trim() === "clothing") {
             const sizeSelector = document.getElementById(`size-select-${id}`);
             if (sizeSelector && !sizeSelector.value) {
               alert("Please select a size before adding this clothing item to the cart.");
@@ -213,7 +215,6 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // Expanded Checkout Form Structure Validator Pipeline
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", (e) => {
       e.preventDefault();
