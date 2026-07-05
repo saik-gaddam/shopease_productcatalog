@@ -1,42 +1,45 @@
-// Self-Executing Cart Module (IIFE Pattern)
+// Application Cart Operations State Manager Engine
 const Cart = (() => {
-  let items = JSON.parse(localStorage.getItem("shopease_cart")) || [];
+  let items = [];
 
-  const save = () => {
-    localStorage.setItem("shopease_cart", JSON.stringify(items));
+  function saveAndDispatch() {
     document.dispatchEvent(new CustomEvent("cartUpdated"));
-  };
+  }
 
   return {
     getItems: () => items,
+    getCount: () => items.reduce((acc, item) => acc + item.quantity, 0),
+    getTotal: () => items.reduce((acc, item) => acc + (item.price * item.quantity), 0),
+    
     addItem: (product) => {
-      const existing = items.find(i => i.id === product.id);
-      if (existing) {
-        existing.quantity += 1;
+      const match = items.find(i => i.id === product.id);
+      if (match) {
+        match.quantity += 1;
       } else {
         items.push({ ...product, quantity: 1 });
       }
-      save();
+      saveAndDispatch();
     },
-    updateQuantity: (id, amount) => {
-      const item = items.find(i => i.id === id);
-      if (item) {
-        item.quantity += amount;
-        if (item.quantity <= 0) {
+    
+    updateQuantity: (id, change) => {
+      const match = items.find(i => i.id === id);
+      if (match) {
+        match.quantity += change;
+        if (match.quantity <= 0) {
           items = items.filter(i => i.id !== id);
         }
-        save();
+        saveAndDispatch();
       }
     },
+    
     removeItem: (id) => {
       items = items.filter(i => i.id !== id);
-      save();
+      saveAndDispatch();
     },
+    
     clear: () => {
       items = [];
-      save();
-    },
-    getCount: () => items.reduce((sum, i) => sum + i.quantity, 0),
-    getTotal: () => items.reduce((sum, i) => sum + (i.price * i.quantity), 0)
+      saveAndDispatch();
+    }
   };
 })();
