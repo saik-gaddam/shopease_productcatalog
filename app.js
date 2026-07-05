@@ -1,11 +1,9 @@
 // Application Wizard UI Controller Logic
 window.addEventListener("load", () => {
-  // Theme Configuration Initialization
   if (localStorage.getItem("dark-theme") === "true") {
     document.body.classList.add("dark-theme");
   }
 
-  // Bind Core Element Layout Hooks
   const productGrid = document.getElementById("product-grid");
   const searchInput = document.getElementById("search-input");
   const categoryFilter = document.getElementById("category-filter");
@@ -23,7 +21,6 @@ window.addEventListener("load", () => {
   const closeConfirmation = document.getElementById("close-confirmation");
   const summaryOrderId = document.getElementById("summary-order-id");
 
-  // Step Switch Navigation Engine
   function navigateToStep(stepNumber) {
     document.querySelectorAll(".wizard-step").forEach(step => step.classList.remove("active"));
     document.getElementById(`step-${stepNumber}`).classList.add("active");
@@ -38,7 +35,6 @@ window.addEventListener("load", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // Hook Step Switch Navigation Listeners to Buttons
   document.querySelectorAll(".prev-step-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       const stepTarget = parseInt(btn.getAttribute("data-target"));
@@ -56,20 +52,38 @@ window.addEventListener("load", () => {
       productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No matching products discovered.</p>`;
       return;
     }
-    productGrid.innerHTML = filteredList.map(p => `
-      <article class="product-card">
-        <div class="product-img-wrapper">${p.icon || '📦'}</div>
-        <div class="product-info">
-          <span class="product-category">${p.category}</span>
-          <h3 class="product-title">${p.name}</h3>
-          <p class="product-rating">⭐ ${p.rating} <span>(${Math.floor(p.rating * 15)} reviews)</span></p>
-          <div class="product-footer">
-            <span class="product-price">$${p.price.toFixed(2)}</span>
-            <button class="btn btn-primary add-to-cart-btn" data-id="${p.id}">Add to Cart</button>
-          </div>
+    productGrid.innerHTML = filteredList.map(p => {
+      // Injects size selectors conditionally if product category is clothing
+      const isClothing = p.category.toLowerCase() === "clothing";
+      const sizeSelectorHtml = isClothing ? `
+        <div class="product-size-container">
+          <label for="size-select-${p.id}">Size:</label>
+          <select id="size-select-${p.id}" class="size-dropdown">
+            <option value="">Select Size</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+          </select>
         </div>
-      </article>
-    `).join("");
+      ` : '';
+
+      return `
+        <article class="product-card">
+          <div class="product-img-wrapper">${p.icon || '📦'}</div>
+          <div class="product-info">
+            <span class="product-category">${p.category}</span>
+            <h3 class="product-title">${p.name}</h3>
+            <p class="product-rating">⭐ ${p.rating} <span>(${Math.floor(p.rating * 15)} reviews)</span></p>
+            ${sizeSelectorHtml}
+            <div class="product-footer">
+              <span class="product-price">$${p.price.toFixed(2)}</span>
+              <button class="btn btn-primary add-to-cart-btn" data-id="${p.id}">Add to Cart</button>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
   }
 
   function renderCart() {
@@ -89,23 +103,21 @@ window.addEventListener("load", () => {
       <div class="cart-item">
         <div class="cart-item-img">${item.icon || '📦'}</div>
         <div class="cart-item-details">
-          <h4 class="cart-item-title">${item.name}</h4>
+          <h4 class="cart-item-title">${item.name} ${item.selectedSize ? `(${item.selectedSize})` : ''}</h4>
           <span class="cart-item-price">$${item.price.toFixed(2)}</span>
           <div class="cart-item-qty">
-            <button class="btn-qty qty-minus" data-id="${item.id}">-</button>
+            <button class="btn-qty qty-minus" data-cart-key="${item.cartKey}">-</button>
             <span>${item.quantity}</span>
-            <button class="btn-qty qty-plus" data-id="${item.id}">+</button>
+            <button class="btn-qty qty-plus" data-cart-key="${item.cartKey}">+</button>
           </div>
         </div>
-        <button class="btn-remove" data-id="${item.id}">🗑️</button>
+        <button class="btn-remove" data-cart-key="${item.cartKey}">🗑️</button>
       </div>
     `).join("");
   }
 
-  // Filtering System Pipelines
   function processCatalogState() {
     let query = searchInput ? searchInput.value.toLowerCase().trim() : "";
-    // Normalizes uppercase filter dropdown entries to case-insensitive match products array entries safely
     let catSelection = categoryFilter ? categoryFilter.value.toLowerCase() : "all";
     let sortType = sortSelect ? sortSelect.value : "default";
 
@@ -147,7 +159,6 @@ window.addEventListener("load", () => {
     }
   }
 
-  // Global Interactive Layout Event Wireframes
   if (themeToggle) {
     themeToggle.addEventListener("click", () => {
       const active = document.body.classList.toggle("dark-theme");
@@ -165,9 +176,21 @@ window.addEventListener("load", () => {
         const id = parseInt(e.target.getAttribute("data-id"));
         const productData = typeof products !== 'undefined' ? products : [];
         const match = productData.find(p => p.id === id);
+        
         if (match) {
-          Cart.addItem(match);
-          displayToast(`Added ${match.name} to cart!`);
+          let selectedSize = null;
+          if (match.category.toLowerCase() === "clothing") {
+            const sizeSelector = document.getElementById(`size-select-${id}`);
+            if (sizeSelector && !sizeSelector.value) {
+              alert("Please select a size before adding this clothing item to the cart.");
+              sizeSelector.focus();
+              return;
+            }
+            selectedSize = sizeSelector.value;
+          }
+          
+          Cart.addItem(match, selectedSize);
+          displayToast(`Added ${match.name} ${selectedSize ? `(${selectedSize})` : ''} to cart!`);
         }
       }
     });
@@ -175,14 +198,14 @@ window.addEventListener("load", () => {
 
   if (cartItemsContainer) {
     cartItemsContainer.addEventListener("click", (e) => {
-      const id = parseInt(e.target.getAttribute("data-id"));
-      if (!id) return;
+      const cartKey = e.target.getAttribute("data-cart-key");
+      if (!cartKey) return;
 
-      if (e.target.classList.contains("qty-plus")) Cart.updateQuantity(id, 1);
-      else if (e.target.classList.contains("qty-minus")) Cart.updateQuantity(id, -1);
+      if (e.target.classList.contains("qty-plus")) Cart.updateQuantity(cartKey, 1);
+      else if (e.target.classList.contains("qty-minus")) Cart.updateQuantity(cartKey, -1);
       else if (e.target.classList.contains("btn-remove")) {
-        const item = Cart.getItems().find(i => i.id === id);
-        Cart.removeItem(id);
+        const item = Cart.getItems().find(i => i.cartKey === cartKey);
+        Cart.removeItem(cartKey);
         if (item) displayToast(`Removed ${item.name} from cart.`);
       }
     });
@@ -190,7 +213,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // Form Processing Submission Pipeline
+  // Expanded Checkout Form Structure Validator Pipeline
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -215,11 +238,29 @@ window.addEventListener("load", () => {
         formValid = false;
       } else if (phoneNode) markValidity(phoneNode, true);
 
-      const addressNode = document.getElementById("address");
-      if (addressNode && !addressNode.value.trim()) {
-        markValidity(addressNode, false, "Shipping delivery address required.");
+      const addr1Node = document.getElementById("address-1");
+      if (addr1Node && !addr1Node.value.trim()) {
+        markValidity(addr1Node, false, "Address Line 1 is required.");
         formValid = false;
-      } else if (addressNode) markValidity(addressNode, true);
+      } else if (addr1Node) markValidity(addr1Node, true);
+
+      const cityNode = document.getElementById("city");
+      if (cityNode && !cityNode.value.trim()) {
+        markValidity(cityNode, false, "City field is required.");
+        formValid = false;
+      } else if (cityNode) markValidity(cityNode, true);
+
+      const stateNode = document.getElementById("state");
+      if (stateNode && !stateNode.value.trim()) {
+        markValidity(stateNode, false, "State field is required.");
+        formValid = false;
+      } else if (stateNode) markValidity(stateNode, true);
+
+      const pinNode = document.getElementById("pincode");
+      if (pinNode && !pinNode.value.trim()) {
+        markValidity(pinNode, false, "Pin Code is required.");
+        formValid = false;
+      } else if (pinNode) markValidity(pinNode, true);
 
       if (formValid) {
         if (summaryOrderId) summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
@@ -237,7 +278,6 @@ window.addEventListener("load", () => {
     });
   }
 
-  // Structural Setup Boot Execution Run
   const initialProducts = typeof products !== 'undefined' ? products : [];
   renderProducts(initialProducts);
   renderCart();
