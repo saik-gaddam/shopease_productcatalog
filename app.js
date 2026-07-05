@@ -20,7 +20,7 @@ window.addEventListener("load", () => {
   const closeConfirmation = document.getElementById("close-confirmation");
   const summaryOrderId = document.getElementById("summary-order-id");
 
-  // Step Routing System
+  // Step Nav Routing
   function navigateToStep(stepNumber) {
     document.querySelectorAll(".wizard-step").forEach(step => step.classList.remove("active"));
     const targetStep = document.getElementById(`step-${stepNumber}`);
@@ -46,7 +46,7 @@ window.addEventListener("load", () => {
   if (cartNavBtn) cartNavBtn.addEventListener("click", () => navigateToStep(2));
   if (checkoutBtn) checkoutBtn.addEventListener("click", () => navigateToStep(3));
 
-  // Running Banner Presentation Manager
+  // Running Hero Banner Rotator System
   function initHeroBanner() {
     const bannerContainer = document.getElementById("hero-banner-carousel");
     if (!bannerContainer) return;
@@ -59,7 +59,7 @@ window.addEventListener("load", () => {
     bannerContainer.innerHTML = featuredItems.map((p, idx) => `
       <div class="banner-slide ${idx === 0 ? 'active' : ''}">
         <div class="banner-content">
-          <span class="banner-tag">Special Offer</span>
+          <span class="banner-tag">Special Deal</span>
           <h2 class="banner-title">${p.name}</h2>
           <p class="banner-price">$${p.price.toFixed(2)}</p>
           <button class="btn btn-primary add-to-cart-btn" data-id="${p.id}">Shop Now</button>
@@ -81,11 +81,11 @@ window.addEventListener("load", () => {
     }, 4500);
   }
 
-  // Render main display grid
+  // Render Grid Layout Controls
   function renderProducts(filteredList) {
     if (!productGrid) return;
     if (!filteredList || filteredList.length === 0) {
-      productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No matching items discovered.</p>`;
+      productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No matching products discovered.</p>`;
       return;
     }
     productGrid.innerHTML = filteredList.map(p => {
@@ -111,7 +111,7 @@ window.addEventListener("load", () => {
           <div class="product-info">
             <span class="product-category">${p.category}</span>
             <h3 class="product-title">${p.name}</h3>
-            <p class="product-rating">⭐ ${p.rating} <span>(${Math.floor(p.rating * 12)} reviews)</span></p>
+            <p class="product-rating">⭐ ${p.rating} <span>(${Math.floor(p.rating * 15)} reviews)</span></p>
             ${sizeSelectorHtml}
             <div class="product-footer">
               <span class="product-price">$${p.price.toFixed(2)}</span>
@@ -222,7 +222,7 @@ window.addEventListener("load", () => {
         if (match.category && match.category.toLowerCase().trim() === "clothing") {
           const sizeSelector = document.getElementById(`size-select-${id}`);
           if (sizeSelector && !sizeSelector.value) {
-            alert("Please select a clothing size.");
+            alert("Please select a clothing item size.");
             sizeSelector.focus();
             return;
           }
@@ -251,7 +251,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // ⚡ SUPERFAST INSTANT ADDRESS AUTOCOMPLETE ENGINE ⚡
+  // ⚡ INSTANT ADDRESS ENGINE AUTOCOMPLETE ⚡
   const addr1Node = document.getElementById("address-1") || document.getElementById("address_1");
   const cityNode = document.getElementById("city");
   const stateNode = document.getElementById("state");
