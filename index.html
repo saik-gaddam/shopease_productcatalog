@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopEase — Multi-Step E-commerce Catalog</title>
   <link rel="stylesheet" href="style.css">
+  
+  <!-- ⚡ LIVE GOOGLE MAPS PLACES API ⚡ -->
+  <!-- Note: Replace YOUR_API_KEY with your actual production Google Maps API Key -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
 </head>
 <body>
 
@@ -106,7 +110,8 @@
               </div>
             </div>
 
-            <div class="form-group">
+            <!-- Google Maps API hooks into this target container -->
+            <div class="form-group" style="position: relative;">
               <label for="address-1">Street Address Line 1 *</label>
               <input type="text" id="address-1" required placeholder="Enter street name and house number">
               <span class="error-msg"></span>
@@ -115,17 +120,17 @@
             <div class="form-row">
               <div class="form-group">
                 <label for="city">City *</label>
-                <input type="text" id="city" required placeholder="City name">
+                <input type="text" id="city" required placeholder="City name" readonly>
                 <span class="error-msg"></span>
               </div>
               <div class="form-group">
                 <label for="state">State *</label>
-                <input type="text" id="state" required placeholder="State initials">
+                <input type="text" id="state" required placeholder="State initials" readonly>
                 <span class="error-msg"></span>
               </div>
               <div class="form-group">
                 <label for="pincode">PIN / Postal Code *</label>
-                <input type="text" id="pincode" required placeholder="ZIP Code">
+                <input type="text" id="pincode" required placeholder="ZIP Code" readonly>
                 <span class="error-msg"></span>
               </div>
             </div>
