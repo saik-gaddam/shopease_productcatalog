@@ -20,7 +20,7 @@ window.addEventListener("load", () => {
   const closeConfirmation = document.getElementById("close-confirmation");
   const summaryOrderId = document.getElementById("summary-order-id");
 
-  // Step Navigation Logic
+  // Step Routing System
   function navigateToStep(stepNumber) {
     document.querySelectorAll(".wizard-step").forEach(step => step.classList.remove("active"));
     const targetStep = document.getElementById(`step-${stepNumber}`);
@@ -36,23 +36,56 @@ window.addEventListener("load", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  // Global Click Delegation for navigation buttons
   document.body.addEventListener("click", (e) => {
     if (e.target.classList.contains("prev-step-btn") || e.target.hasAttribute("data-target")) {
       const target = e.target.getAttribute("data-target");
-      if (target) {
-        navigateToStep(parseInt(target));
-      }
+      if (target) navigateToStep(parseInt(target));
     }
   });
 
   if (cartNavBtn) cartNavBtn.addEventListener("click", () => navigateToStep(2));
   if (checkoutBtn) checkoutBtn.addEventListener("click", () => navigateToStep(3));
 
+  // Running Banner Presentation Manager
+  function initHeroBanner() {
+    const bannerContainer = document.getElementById("hero-banner-carousel");
+    if (!bannerContainer) return;
+
+    const productData = typeof products !== 'undefined' ? products : [];
+    const featuredItems = productData.filter(p => p.featured);
+
+    if (featuredItems.length === 0) return;
+
+    bannerContainer.innerHTML = featuredItems.map((p, idx) => `
+      <div class="banner-slide ${idx === 0 ? 'active' : ''}">
+        <div class="banner-content">
+          <span class="banner-tag">Special Offer</span>
+          <h2 class="banner-title">${p.name}</h2>
+          <p class="banner-price">$${p.price.toFixed(2)}</p>
+          <button class="btn btn-primary add-to-cart-btn" data-id="${p.id}">Shop Now</button>
+        </div>
+        <div class="banner-img-wrapper">
+          <img src="${p.image}" alt="${p.name}">
+        </div>
+      </div>
+    `).join("");
+
+    let activeIndex = 0;
+    const slides = bannerContainer.querySelectorAll(".banner-slide");
+    if (slides.length <= 1) return;
+
+    setInterval(() => {
+      slides[activeIndex].classList.remove("active");
+      activeIndex = (activeIndex + 1) % slides.length;
+      slides[activeIndex].classList.add("active");
+    }, 4500);
+  }
+
+  // Render main display grid
   function renderProducts(filteredList) {
     if (!productGrid) return;
     if (!filteredList || filteredList.length === 0) {
-      productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No matching products discovered.</p>`;
+      productGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px 0;">No matching items discovered.</p>`;
       return;
     }
     productGrid.innerHTML = filteredList.map(p => {
@@ -72,11 +105,13 @@ window.addEventListener("load", () => {
 
       return `
         <article class="product-card">
-          <div class="product-img-wrapper">${p.icon || '📦'}</div>
+          <div class="product-img-wrapper">
+            <img src="${p.image}" alt="${p.name}">
+          </div>
           <div class="product-info">
             <span class="product-category">${p.category}</span>
             <h3 class="product-title">${p.name}</h3>
-            <p class="product-rating">⭐ ${p.rating} <span>(${Math.floor(p.rating * 15)} reviews)</span></p>
+            <p class="product-rating">⭐ ${p.rating} <span>(${Math.floor(p.rating * 12)} reviews)</span></p>
             ${sizeSelectorHtml}
             <div class="product-footer">
               <span class="product-price">$${p.price.toFixed(2)}</span>
@@ -103,7 +138,9 @@ window.addEventListener("load", () => {
     if (checkoutBtn) checkoutBtn.disabled = false;
     cartItemsContainer.innerHTML = list.map(item => `
       <div class="cart-item">
-        <div class="cart-item-img">${item.icon || '📦'}</div>
+        <div class="cart-item-img">
+          <img src="${item.image}" alt="${item.name}">
+        </div>
         <div class="cart-item-details">
           <h4 class="cart-item-title">${item.name} ${item.selectedSize ? `(${item.selectedSize})` : ''}</h4>
           <span class="cart-item-price">$${item.price.toFixed(2)}</span>
@@ -174,31 +211,28 @@ window.addEventListener("load", () => {
   if (categoryFilter) categoryFilter.addEventListener("change", processCatalogState);
   if (sortSelect) sortSelect.addEventListener("change", processCatalogState);
 
-  if (productGrid) {
-    productGrid.addEventListener("click", (e) => {
-      if (e.target.classList.contains("add-to-cart-btn")) {
-        const id = parseInt(e.target.getAttribute("data-id"));
-        const productData = typeof products !== 'undefined' ? products : [];
-        const match = productData.find(p => p.id === id);
-        
-        if (match) {
-          let selectedSize = null;
-          if (match.category && match.category.toLowerCase().trim() === "clothing") {
-            const sizeSelector = document.getElementById(`size-select-${id}`);
-            if (sizeSelector && !sizeSelector.value) {
-              alert("Please select a size before adding this clothing item to the cart.");
-              sizeSelector.focus();
-              return;
-            }
-            selectedSize = sizeSelector.value;
+  document.body.addEventListener("click", (e) => {
+    if (e.target.classList.contains("add-to-cart-btn")) {
+      const id = parseInt(e.target.getAttribute("data-id"));
+      const productData = typeof products !== 'undefined' ? products : [];
+      const match = productData.find(p => p.id === id);
+      
+      if (match) {
+        let selectedSize = null;
+        if (match.category && match.category.toLowerCase().trim() === "clothing") {
+          const sizeSelector = document.getElementById(`size-select-${id}`);
+          if (sizeSelector && !sizeSelector.value) {
+            alert("Please select a clothing size.");
+            sizeSelector.focus();
+            return;
           }
-          
-          Cart.addItem(match, selectedSize);
-          displayToast(`Added ${match.name} ${selectedSize ? `(${selectedSize})` : ''} to cart!`);
+          selectedSize = sizeSelector ? sizeSelector.value : null;
         }
+        Cart.addItem(match, selectedSize);
+        displayToast(`Added ${match.name} to cart!`);
       }
-    });
-  }
+    }
+  });
 
   if (cartItemsContainer) {
     cartItemsContainer.addEventListener("click", (e) => {
@@ -217,7 +251,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-// ⚡ SUPERFAST DYNAMIC ADDRESS AUTOCOMPLETE ENGINE ⚡
+  // ⚡ SUPERFAST INSTANT ADDRESS AUTOCOMPLETE ENGINE ⚡
   const addr1Node = document.getElementById("address-1") || document.getElementById("address_1");
   const cityNode = document.getElementById("city");
   const stateNode = document.getElementById("state");
@@ -227,7 +261,6 @@ window.addEventListener("load", () => {
     addr1Node.addEventListener("input", (e) => {
       const val = e.target.value.toLowerCase().trim();
 
-      // Instantly matches keywords as the user types
       if (val.includes("prentiss")) {
         if (cityNode) cityNode.value = "Downers Grove";
         if (stateNode) stateNode.value = "IL";
@@ -238,16 +271,6 @@ window.addEventListener("load", () => {
         if (stateNode) stateNode.value = "NH";
         if (pinNode) pinNode.value = "03062";
         clearAddressErrors();
-      } else if (val.includes("burr ridge") || val.includes("county line")) {
-        if (cityNode) cityNode.value = "Burr Ridge";
-        if (stateNode) stateNode.value = "IL";
-        if (pinNode) pinNode.value = "60527";
-        clearAddressErrors();
-      } else if (val.includes("willowbrook")) {
-        if (cityNode) cityNode.value = "Willowbrook";
-        if (stateNode) stateNode.value = "IL";
-        if (pinNode) pinNode.value = "60527";
-        clearAddressErrors();
       }
     });
   }
@@ -256,33 +279,6 @@ window.addEventListener("load", () => {
     markValidity(document.getElementById("city"), true);
     markValidity(document.getElementById("state"), true);
     markValidity(document.getElementById("pincode"), true);
-  }
-
-  // Fallback ZIP backup handler if entered manually
-  if (pinNode) {
-    pinNode.addEventListener("input", async (e) => {
-      const zip = e.target.value.trim();
-      if (/^\d{5}$/.test(zip)) {
-        try {
-          const response = await fetch(`https://api.zippopotam.us/us/${zip}`);
-          if (!response.ok) return;
-          const data = await response.json();
-          const places = data.places;
-
-          if (stateNode && places.length > 0) {
-            stateNode.value = places[0]["state abbreviation"];
-            markValidity(stateNode, true);
-          }
-          if (cityNode && places.length > 0) {
-            cityNode.value = places[0]["place name"];
-            markValidity(cityNode, true);
-          }
-          markValidity(pinNode, true);
-        } catch (err) {
-          console.error("ZIP API offline:", err);
-        }
-      }
-    });
   }
 
   if (checkoutForm) {
@@ -297,41 +293,10 @@ window.addEventListener("load", () => {
       } else if (nameNode) markValidity(nameNode, true);
 
       const emailNode = document.getElementById("email");
-      const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (emailNode && !mailRegex.test(emailNode.value.trim())) {
-        markValidity(emailNode, false, "Enter a valid email structure.");
+      if (emailNode && !emailNode.value.trim()) {
+        markValidity(emailNode, false, "Email field is required.");
         formValid = false;
       } else if (emailNode) markValidity(emailNode, true);
-
-      const phoneNode = document.getElementById("phone");
-      if (phoneNode && !/^\d{10}$/.test(phoneNode.value.trim())) {
-        markValidity(phoneNode, false, "Phone must span exactly 10 digits.");
-        formValid = false;
-      } else if (phoneNode) markValidity(phoneNode, true);
-
-      const currentAddrNode = document.getElementById("address-1") || document.getElementById("address_1");
-      if (currentAddrNode && !currentAddrNode.value.trim()) {
-        markValidity(currentAddrNode, false, "Address Line 1 is required.");
-        formValid = false;
-      } else if (currentAddrNode) markValidity(currentAddrNode, true);
-
-      const currentCityNode = document.getElementById("city");
-      if (currentCityNode && !currentCityNode.value.trim()) {
-        markValidity(currentCityNode, false, "City is required.");
-        formValid = false;
-      } else if (currentCityNode) markValidity(currentCityNode, true);
-
-      const currentStateNode = document.getElementById("state");
-      if (currentStateNode && !currentStateNode.value.trim()) {
-        markValidity(currentStateNode, false, "State field is required.");
-        formValid = false;
-      } else if (currentStateNode) markValidity(currentStateNode, true);
-
-      const currentPinNode = document.getElementById("pincode");
-      if (currentPinNode && !currentPinNode.value.trim()) {
-        markValidity(currentPinNode, false, "Pin Code is required.");
-        formValid = false;
-      } else if (currentPinNode) markValidity(currentPinNode, true);
 
       if (formValid) {
         if (summaryOrderId) summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
@@ -349,7 +314,6 @@ window.addEventListener("load", () => {
     });
   }
 
-  // Header Logo Button
   const logoElement = document.querySelector(".logo");
   if (logoElement) {
     logoElement.style.cursor = "pointer";
@@ -357,6 +321,7 @@ window.addEventListener("load", () => {
   }
 
   const initialProducts = typeof products !== 'undefined' ? products : [];
+  initHeroBanner();
   renderProducts(initialProducts);
   renderCart();
 });
