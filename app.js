@@ -1,5 +1,4 @@
 window.addEventListener("load", () => {
-  // Theme initialization
   if (localStorage.getItem("dark-theme") === "true") {
     document.body.classList.add("dark-theme");
   }
@@ -21,7 +20,6 @@ window.addEventListener("load", () => {
   const closeConfirmation = document.getElementById("close-confirmation");
   const summaryOrderId = document.getElementById("summary-order-id");
 
-  // Step Navigation Manager
   function navigateToStep(stepNumber) {
     document.querySelectorAll(".wizard-step").forEach(step => step.classList.remove("active"));
     const targetStep = document.getElementById(`step-${stepNumber}`);
@@ -47,7 +45,6 @@ window.addEventListener("load", () => {
   if (cartNavBtn) cartNavBtn.addEventListener("click", () => navigateToStep(2));
   if (checkoutBtn) checkoutBtn.addEventListener("click", () => navigateToStep(3));
 
-  // Running Hero Banner Carousel Rotator System
   function initHeroBanner() {
     const bannerContainer = document.getElementById("hero-banner-carousel");
     if (!bannerContainer) return;
@@ -82,7 +79,6 @@ window.addEventListener("load", () => {
     }, 4500);
   }
 
-  // Render Catalog Grid Products
   function renderProducts(filteredList) {
     if (!productGrid) return;
     if (!filteredList || filteredList.length === 0) {
@@ -252,7 +248,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // ⚡ LIVE GOOGLE MAPS API PLACES AUTOCOMPLETE ENGINE ⚡
+  // ⚡ GOOGLE MAPS AUTOCOMPLETE PROTECTION ⚡
   const addr1Input = document.getElementById("address-1");
   const cityInput = document.getElementById("city");
   const stateInput = document.getElementById("state");
@@ -262,13 +258,11 @@ window.addEventListener("load", () => {
     const group1 = addr1Input.closest(".form-group");
     group1.style.position = "relative";
     
-    // Autocomplete Dropdown List Overlay
     const dropdown = document.createElement("div");
     dropdown.id = "address-autocomplete-dropdown";
     dropdown.style.cssText = "position:absolute; background:var(--bg-card); border:1px solid var(--border-color); width:100%; max-height:250px; overflow-y:auto; z-index:1000; display:none; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); margin-top:45px;";
     group1.appendChild(dropdown);
 
-    // Conditional Unit / Appartment box container setup
     const unitPrompt = document.createElement("div");
     unitPrompt.id = "unit-prompt-container";
     unitPrompt.style.cssText = "display:none; background:var(--bg-app); border-left:4px solid var(--primary-color); padding:10px; margin:10px 0; border-radius:4px; font-size:0.9rem;";
@@ -278,56 +272,54 @@ window.addEventListener("load", () => {
     `;
     group1.after(unitPrompt);
 
-    const autocompleteService = new google.maps.places.AutocompleteService();
-    const placesService = new google.maps.places.PlacesService(document.createElement('div'));
+    try {
+      const autocompleteService = new google.maps.places.AutocompleteService();
+      const placesService = new google.maps.places.PlacesService(document.createElement('div'));
 
-    addr1Input.addEventListener("input", (e) => {
-      const val = e.target.value.trim();
-      dropdown.innerHTML = "";
-      dropdown.style.display = "none";
+      addr1Input.addEventListener("input", (e) => {
+        const val = e.target.value.trim();
+        dropdown.innerHTML = "";
+        dropdown.style.display = "none";
 
-      // Instantly clear outdated downstream form properties upon editing street entries
-      if (cityInput) cityInput.value = "";
-      if (stateInput) stateInput.value = "";
-      if (pinInput) pinInput.value = "";
-      if (unitPrompt) unitPrompt.style.display = "none";
+        if (val.length < 3) return;
 
-      if (val.length < 3) return;
+        autocompleteService.getPlacePredictions({
+          input: val,
+          componentRestrictions: { country: 'us' },
+          types: ['address']
+        }, (predictions, status) => {
+          if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) return;
 
-      autocompleteService.getPlacePredictions({
-        input: val,
-        componentRestrictions: { country: 'us' },
-        types: ['address']
-      }, (predictions, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !predictions) return;
+          dropdown.style.display = "block";
 
-        dropdown.style.display = "block";
+          predictions.forEach((prediction) => {
+            const item = document.createElement("div");
+            item.style.cssText = "padding:10px 15px; cursor:pointer; border-bottom:1px solid var(--border-color); font-weight:500; font-size:0.95rem;";
+            item.textContent = prediction.description;
 
-        predictions.forEach((prediction) => {
-          const item = document.createElement("div");
-          item.style.cssText = "padding:10px 15px; cursor:pointer; border-bottom:1px solid var(--border-color); font-weight:500; font-size:0.95rem;";
-          item.textContent = prediction.description;
+            item.addEventListener("click", () => {
+              addr1Input.value = prediction.structured_formatting.main_text;
+              dropdown.style.display = "none";
 
-          item.addEventListener("click", () => {
-            addr1Input.value = prediction.structured_formatting.main_text;
-            dropdown.style.display = "none";
-
-            placesService.getDetails({
-              placeId: prediction.place_id,
-              fields: ['address_components']
-            }, (place, detailsStatus) => {
-              if (detailsStatus === google.maps.places.PlacesServiceStatus.OK) {
-                parseAndPopulateAddress(place.address_components);
-              }
+              placesService.getDetails({
+                placeId: prediction.place_id,
+                fields: ['address_components']
+              }, (place, detailsStatus) => {
+                if (detailsStatus === google.maps.places.PlacesServiceStatus.OK) {
+                  parseAndPopulateAddress(place.address_components);
+                }
+              });
             });
-          });
 
-          item.addEventListener("mouseenter", () => item.style.background = "var(--border-color)");
-          item.addEventListener("mouseleave", () => item.style.background = "none");
-          dropdown.appendChild(item);
+            item.addEventListener("mouseenter", () => item.style.background = "var(--border-color)");
+            item.addEventListener("mouseleave", () => item.style.background = "none");
+            dropdown.appendChild(item);
+          });
         });
       });
-    });
+    } catch (e) {
+      console.warn("Google Places Autocomplete failed to configure. Input fields reverted to manual entries safely.", e);
+    }
 
     function parseAndPopulateAddress(components) {
       let streetNumber = "";
@@ -369,7 +361,16 @@ window.addEventListener("load", () => {
     });
   }
 
-  // Final Form Submission handler with First Name and Last Name processing
+  // Handle inputs typing changes to remove warning frameworks
+  ["first-name", "last-name", "email", "address-1", "city", "state", "pincode"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("input", () => {
+        if (el.value.trim()) markValidity(el, true);
+      });
+    }
+  });
+
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", (e) => {
       e.preventDefault();
@@ -379,25 +380,43 @@ window.addEventListener("load", () => {
       if (firstNameNode && !firstNameNode.value.trim()) {
         markValidity(firstNameNode, false, "First name field is required.");
         formValid = false;
-      } else if (firstNameNode) markValidity(firstNameNode, true);
+      }
 
       const lastNameNode = document.getElementById("last-name");
       if (lastNameNode && !lastNameNode.value.trim()) {
         markValidity(lastNameNode, false, "Last name field is required.");
         formValid = false;
-      } else if (lastNameNode) markValidity(lastNameNode, true);
+      }
 
       const emailNode = document.getElementById("email");
       if (emailNode && !emailNode.value.trim()) {
         markValidity(emailNode, false, "Email field is required.");
         formValid = false;
-      } else if (emailNode) markValidity(emailNode, true);
+      }
 
       const addrNode = document.getElementById("address-1");
       if (addrNode && !addrNode.value.trim()) {
         markValidity(addrNode, false, "Please enter a valid street address.");
         formValid = false;
-      } else if (addrNode) markValidity(addrNode, true);
+      }
+
+      const cityNode = document.getElementById("city");
+      if (cityNode && !cityNode.value.trim()) {
+        markValidity(cityNode, false, "City field is required.");
+        formValid = false;
+      }
+
+      const stateNode = document.getElementById("state");
+      if (stateNode && !stateNode.value.trim()) {
+        markValidity(stateNode, false, "State field is required.");
+        formValid = false;
+      }
+
+      const pinNode = document.getElementById("pincode");
+      if (pinNode && !pinNode.value.trim()) {
+        markValidity(pinNode, false, "ZIP Code field is required.");
+        formValid = false;
+      }
 
       if (formValid) {
         if (summaryOrderId) summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
