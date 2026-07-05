@@ -1,4 +1,3 @@
-// Application Wizard UI Controller Logic
 window.addEventListener("load", () => {
   if (localStorage.getItem("dark-theme") === "true") {
     document.body.classList.add("dark-theme");
@@ -45,7 +44,6 @@ window.addEventListener("load", () => {
   if (cartNavBtn) cartNavBtn.addEventListener("click", () => navigateToStep(2));
   if (checkoutBtn) checkoutBtn.addEventListener("click", () => navigateToStep(3));
 
-  // Dynamic Content Rendering Engine
   function renderProducts(filteredList) {
     if (!productGrid) return;
     if (!filteredList || filteredList.length === 0) {
@@ -53,7 +51,6 @@ window.addEventListener("load", () => {
       return;
     }
     productGrid.innerHTML = filteredList.map(p => {
-      // Robust case-insensitive category check
       const isClothing = p.category && p.category.toLowerCase().trim() === "clothing";
       const sizeSelectorHtml = isClothing ? `
         <div class="product-size-container">
@@ -180,7 +177,6 @@ window.addEventListener("load", () => {
         
         if (match) {
           let selectedSize = null;
-          // Bulletproof runtime category match
           if (match.category && match.category.toLowerCase().trim() === "clothing") {
             const sizeSelector = document.getElementById(`size-select-${id}`);
             if (sizeSelector && !sizeSelector.value) {
