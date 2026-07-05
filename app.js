@@ -20,9 +20,11 @@ window.addEventListener("load", () => {
   const closeConfirmation = document.getElementById("close-confirmation");
   const summaryOrderId = document.getElementById("summary-order-id");
 
+  // Robust step switcher logic
   function navigateToStep(stepNumber) {
     document.querySelectorAll(".wizard-step").forEach(step => step.classList.remove("active"));
-    document.getElementById(`step-${stepNumber}`).classList.add("active");
+    const targetStep = document.getElementById(`step-${stepNumber}`);
+    if (targetStep) targetStep.classList.add("active");
 
     document.querySelectorAll(".progress-step").forEach((dot, index) => {
       if (index + 1 <= stepNumber) {
@@ -34,11 +36,14 @@ window.addEventListener("load", () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  document.querySelectorAll(".prev-step-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const stepTarget = parseInt(btn.getAttribute("data-target"));
-      navigateToStep(stepTarget);
-    });
+  // Globally delegate step transition buttons (Back/Next)
+  document.body.addEventListener("click", (e) => {
+    if (e.target.classList.contains("prev-step-btn") || e.target.hasAttribute("data-target")) {
+      const target = e.target.getAttribute("data-target");
+      if (target) {
+        navigateToStep(parseInt(target));
+      }
+    }
   });
 
   if (cartNavBtn) cartNavBtn.addEventListener("click", () => navigateToStep(2));
@@ -145,6 +150,7 @@ window.addEventListener("load", () => {
   }
 
   function markValidity(element, isValid, message = "") {
+    if (!element) return;
     const group = element.closest(".form-group");
     if (!group) return;
     const errorDisplay = group.querySelector(".error-msg");
@@ -211,7 +217,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // Dynamic ZIP Code Autocomplete API Logic
+  // Dynamic ZIP Code Autocomplete Engine
   const pinNode = document.getElementById("pincode");
   const stateNode = document.getElementById("state");
 
@@ -223,13 +229,12 @@ window.addEventListener("load", () => {
         try {
           const response = await fetch(`https://api.zippopotam.us/us/${zip}`);
           if (!response.ok) {
-            markValidity(pinNode, false, "Invalid ZIP code structure or region.");
+            markValidity(pinNode, false, "Invalid or unmapped ZIP code.");
             return;
           }
 
           const data = await response.json();
           const places = data.places;
-
           markValidity(pinNode, true);
 
           if (stateNode && places.length > 0) {
@@ -237,48 +242,31 @@ window.addEventListener("load", () => {
             markValidity(stateNode, true);
           }
 
-          const cityNode = document.getElementById("city");
-          if (cityNode && places.length > 0) {
+          const cityContainer = document.getElementById("city").parentElement;
+          if (cityContainer && places.length > 0) {
             if (places.length > 1) {
-              const selectDropdown = document.createElement("select");
-              selectDropdown.id = "city";
-              
-              let optionsHtml = `<option value="">Select Nearby City</option>`;
-              places.forEach(place => {
-                const cityName = place["place name"];
-                optionsHtml += `<option value="${cityName}">${cityName}</option>`;
-              });
-              
-              selectDropdown.innerHTML = optionsHtml;
-              cityNode.replaceWith(selectDropdown);
-              
-              // Bind a validity clearance wrapper on selection changes
-              selectDropdown.addEventListener("change", () => {
-                if(selectDropdown.value) markValidity(selectDropdown, true);
-              });
+              cityContainer.innerHTML = `
+                <label for="city">City</label>
+                <select id="city" class="size-dropdown" style="width:100%; padding:10px; border-radius:8px; background-color:var(--bg-main); color:var(--text-main); border:1px solid var(--border-color); outline:none;">
+                  <option value="">Select Nearby City</option>
+                  ${places.map(pl => `<option value="${pl['place name']}">${pl['place name']}</option>`).join('')}
+                </select>
+                <span class="error-msg"></span>
+              `;
             } else {
-              ensureCityIsTextInput();
-              const updatedCityNode = document.getElementById("city");
-              updatedCityNode.value = places[0]["place name"];
-              markValidity(updatedCityNode, true);
+              cityContainer.innerHTML = `
+                <label for="city">City</label>
+                <input type="text" id="city" value="${places[0]['place name']}">
+                <span class="error-msg"></span>
+              `;
             }
+            markValidity(document.getElementById("city"), true);
           }
         } catch (error) {
-          console.error("ZIP code API transaction encountered an anomaly:", error);
+          console.error("ZIP pipeline error:", error);
         }
       }
     });
-  }
-
-  function ensureCityIsTextInput() {
-    const currentCityField = document.getElementById("city");
-    if (currentCityField && currentCityField.tagName === "SELECT") {
-      const textInput = document.createElement("input");
-      textInput.type = "text";
-      textInput.id = "city";
-      textInput.placeholder = "New York";
-      currentCityField.replaceWith(textInput);
-    }
   }
 
   if (checkoutForm) {
@@ -305,7 +293,7 @@ window.addEventListener("load", () => {
         formValid = false;
       } else if (phoneNode) markValidity(phoneNode, true);
 
-      const addr1Node = document.getElementById("address-1");
+      const addr1Node = document.getElementById("address-1") || document.getElementById("address_1");
       if (addr1Node && !addr1Node.value.trim()) {
         markValidity(addr1Node, false, "Address Line 1 is required.");
         formValid = false;
@@ -317,11 +305,11 @@ window.addEventListener("load", () => {
         formValid = false;
       } else if (cityNode) markValidity(cityNode, true);
 
-      const stateNode = document.getElementById("state");
-      if (stateNode && !stateNode.value.trim()) {
-        markValidity(stateNode, false, "State field is required.");
+      const stateNodeObj = document.getElementById("state");
+      if (stateNodeObj && !stateNodeObj.value.trim()) {
+        markValidity(stateNodeObj, false, "State field is required.");
         formValid = false;
-      } else if (stateNode) markValidity(stateNode, true);
+      } else if (stateNodeObj) markValidity(stateNodeObj, true);
 
       const currentPinNode = document.getElementById("pincode");
       if (currentPinNode && !currentPinNode.value.trim()) {
@@ -332,7 +320,6 @@ window.addEventListener("load", () => {
       if (formValid) {
         if (summaryOrderId) summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
         if (confirmationModal) confirmationModal.classList.add("open");
-        ensureCityIsTextInput(); 
         Cart.clear();
         checkoutForm.reset();
       }
@@ -346,24 +333,12 @@ window.addEventListener("load", () => {
     });
   }
 
-  // Home Button / Go Back Utility Setup
+  // Header Logo Action acting as Home Button
   const logoElement = document.querySelector(".logo");
   if (logoElement) {
     logoElement.style.cursor = "pointer";
-    logoElement.addEventListener("click", () => {
-      // Directs the interface back to Step 1 seamlessly
-      navigateToStep(1);
-    });
+    logoElement.addEventListener("click", () => navigateToStep(1));
   }
-
-  // Fallback programmatic historical back router utility if needed explicitly
-  window.goBackToPreviousWebsite = () => {
-    if (document.referrer) {
-      window.location.href = document.referrer;
-    } else {
-      window.history.back();
-    }
-  };
 
   const initialProducts = typeof products !== 'undefined' ? products : [];
   renderProducts(initialProducts);
