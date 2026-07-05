@@ -252,7 +252,7 @@ window.addEventListener("load", () => {
 
   document.addEventListener("cartUpdated", renderCart);
 
-  // ⚡ LIVE GOOGLE MAPS API PLACES AUTOCOMPLETE & DISAMBIGUATION INTEGRATION ⚡
+  // ⚡ LIVE GOOGLE MAPS API PLACES AUTOCOMPLETE ENGINE ⚡
   const addr1Input = document.getElementById("address-1");
   const cityInput = document.getElementById("city");
   const stateInput = document.getElementById("state");
@@ -262,13 +262,13 @@ window.addEventListener("load", () => {
     const group1 = addr1Input.closest(".form-group");
     group1.style.position = "relative";
     
-    // Autocomplete Dropdown List Element
+    // Autocomplete Dropdown List Overlay
     const dropdown = document.createElement("div");
     dropdown.id = "address-autocomplete-dropdown";
     dropdown.style.cssText = "position:absolute; background:var(--bg-card); border:1px solid var(--border-color); width:100%; max-height:250px; overflow-y:auto; z-index:1000; display:none; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.1); margin-top:45px;";
     group1.appendChild(dropdown);
 
-    // Conditional Address Line 2 Container
+    // Conditional Unit / Appartment box container setup
     const unitPrompt = document.createElement("div");
     unitPrompt.id = "unit-prompt-container";
     unitPrompt.style.cssText = "display:none; background:var(--bg-app); border-left:4px solid var(--primary-color); padding:10px; margin:10px 0; border-radius:4px; font-size:0.9rem;";
@@ -286,7 +286,13 @@ window.addEventListener("load", () => {
       dropdown.innerHTML = "";
       dropdown.style.display = "none";
 
-      if (val.length < 3) return; // Fetch matching locations after 3 characters to conserve quota
+      // Instantly clear outdated downstream form properties upon editing street entries
+      if (cityInput) cityInput.value = "";
+      if (stateInput) stateInput.value = "";
+      if (pinInput) pinInput.value = "";
+      if (unitPrompt) unitPrompt.style.display = "none";
+
+      if (val.length < 3) return;
 
       autocompleteService.getPlacePredictions({
         input: val,
@@ -306,7 +312,6 @@ window.addEventListener("load", () => {
             addr1Input.value = prediction.structured_formatting.main_text;
             dropdown.style.display = "none";
 
-            // Query full breakdown details for selected location item
             placesService.getDetails({
               placeId: prediction.place_id,
               fields: ['address_components']
@@ -343,7 +348,6 @@ window.addEventListener("load", () => {
 
       clearAddressErrors();
       
-      // Prompt for supplementary sub-unit numbers automatically
       if (unitPrompt) {
         unitPrompt.style.display = "block";
         const aptInput = document.getElementById("address-2");
@@ -365,23 +369,35 @@ window.addEventListener("load", () => {
     });
   }
 
-  // Final Form Submissions
+  // Final Form Submission handler with First Name and Last Name processing
   if (checkoutForm) {
     checkoutForm.addEventListener("submit", (e) => {
       e.preventDefault();
       let formValid = true;
 
-      const nameNode = document.getElementById("full-name");
-      if (nameNode && !nameNode.value.trim()) {
-        markValidity(nameNode, false, "Full name field is required.");
+      const firstNameNode = document.getElementById("first-name");
+      if (firstNameNode && !firstNameNode.value.trim()) {
+        markValidity(firstNameNode, false, "First name field is required.");
         formValid = false;
-      } else if (nameNode) markValidity(nameNode, true);
+      } else if (firstNameNode) markValidity(firstNameNode, true);
+
+      const lastNameNode = document.getElementById("last-name");
+      if (lastNameNode && !lastNameNode.value.trim()) {
+        markValidity(lastNameNode, false, "Last name field is required.");
+        formValid = false;
+      } else if (lastNameNode) markValidity(lastNameNode, true);
 
       const emailNode = document.getElementById("email");
       if (emailNode && !emailNode.value.trim()) {
         markValidity(emailNode, false, "Email field is required.");
         formValid = false;
       } else if (emailNode) markValidity(emailNode, true);
+
+      const addrNode = document.getElementById("address-1");
+      if (addrNode && !addrNode.value.trim()) {
+        markValidity(addrNode, false, "Please enter a valid street address.");
+        formValid = false;
+      } else if (addrNode) markValidity(addrNode, true);
 
       if (formValid) {
         if (summaryOrderId) summaryOrderId.textContent = `#SE${Math.floor(100000 + Math.random() * 900000)}`;
