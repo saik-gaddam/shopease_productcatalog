@@ -149,3 +149,32 @@ body.dark-theme .product-img-wrapper { background-color: #334155; }
 .toast { background: #1f2937; color: white; padding: 12px 20px; border-radius: var(--radius); animation: slideIn 0.3s forwards, fadeOut 0.3s 2.7s forwards; }
 @keyframes slideIn { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+/* Custom Additions for Size Selectors and Checkout Form Rows */
+.product-size-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+  font-size: 0.9rem;
+}
+.size-dropdown {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  outline: none;
+  cursor: pointer;
+}
+.form-row-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 15px;
+}
+@media (max-width: 480px) {
+  .form-row-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
