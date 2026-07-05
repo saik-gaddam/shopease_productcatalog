@@ -1,139 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ShopEase - Product Catalog</title>
-<link rel="stylesheet" href="css/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopEase — E-commerce Product Catalog</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-
-  <!-- ===================== HEADER ===================== -->
+  <!-- Header & Navigation -->
   <header class="header">
-    <div class="header-inner">
-      <h1 class="logo">🛍️ ShopEase</h1>
-
+    <div class="header-inner container">
+      <h1 class="logo">ShopEase</h1>
       <div class="header-actions">
-        <label class="theme-switch" title="Toggle dark mode">
-          <input type="checkbox" id="darkModeToggle" />
-          <span class="slider">🌙</span>
-        </label>
-
-        <div class="cart-icon" id="cartIcon">
-          🛒
-          <span class="cart-count hidden" id="cartCount">0</span>
-        </div>
+        <button id="theme-toggle" class="btn-icon" aria-label="Toggle Dark Mode">🌓</button>
+        <button id="cart-btn" class="btn-icon" aria-label="Open Cart">
+          🛒 <span id="cart-count" class="cart-badge">0</span>
+        </button>
       </div>
     </div>
   </header>
 
-  <!-- ===================== HERO ===================== -->
-  <section class="hero">
-    <h2>Everything You Need, All in One Place</h2>
-    <p>Browse our curated collection across Electronics, Fashion, Home &amp; Sports.</p>
-  </section>
+  <!-- Main Layout Container -->
+  <main class="container main-content">
+    <!-- Toolbar: Search, Filter, Sort -->
+    <section class="toolbar" aria-label="Catalog Filters">
+      <input type="text" id="search-input" placeholder="Search products...">
+      
+      <select id="category-filter">
+        <option value="all">All Categories</option>
+        <option value="electronics">Electronics</option>
+        <option value="clothing">Clothing</option>
+        <option value="books">Books</option>
+        <option value="home">Home & Kitchen</option>
+      </select>
 
-  <!-- ===================== FILTERS ===================== -->
-  <section class="filters-bar">
-    <input type="text" id="searchInput" placeholder="🔍 Search products..." />
+      <select id="sort-select">
+        <option value="default">Sort By</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+        <option value="rating">Top Rated</option>
+      </select>
+    </section>
 
-    <select id="categoryFilter">
-      <option value="all">All Categories</option>
-      <option value="Electronics">Electronics</option>
-      <option value="Fashion">Fashion</option>
-      <option value="Home">Home</option>
-      <option value="Sports">Sports</option>
-    </select>
-
-    <select id="sortFilter">
-      <option value="default">Sort By</option>
-      <option value="price-asc">Price: Low to High</option>
-      <option value="price-desc">Price: High to Low</option>
-      <option value="rating-desc">Top Rated</option>
-    </select>
-  </section>
-
-  <!-- ===================== PRODUCT GRID ===================== -->
-  <main class="main-content">
-    <div class="product-grid" id="productGrid"></div>
-    <p class="no-results hidden" id="noResults">No products match your search. Try a different keyword or filter.</p>
+    <!-- Product Grid Explorer -->
+    <section id="product-grid" class="product-grid">
+      <!-- Dynamic product cards render here via JS -->
+    </section>
   </main>
 
-  <!-- ===================== CART DRAWER ===================== -->
-  <div class="overlay" id="cartOverlay"></div>
-  <aside class="cart-drawer" id="cartDrawer">
-    <div class="cart-header">
-      <h3>Your Cart</h3>
-      <button class="close-btn" id="closeCartBtn">✕</button>
+  <!-- Slide-out Cart Drawer -->
+  <div id="cart-drawer" class="cart-drawer">
+    <div class="drawer-header">
+      <h2>Your Cart</h2>
+      <button id="close-cart" class="btn-close">&times;</button>
     </div>
-
-    <div class="cart-items" id="cartItems"></div>
-    <p class="cart-empty hidden" id="cartEmptyMsg">Your cart is empty.</p>
-
-    <div class="cart-footer">
-      <div class="cart-subtotal-row">
-        <span>Subtotal</span>
-        <span id="cartSubtotal">₹0</span>
-      </div>
-      <button class="btn-checkout" id="checkoutBtn" disabled>Proceed to Checkout</button>
+    <div id="cart-items" class="drawer-body">
+      <!-- Dynamic cart items list here -->
     </div>
-  </aside>
-
-  <!-- ===================== CHECKOUT MODAL ===================== -->
-  <div class="overlay" id="checkoutOverlay"></div>
-  <div class="checkout-modal" id="checkoutModal">
-    <button class="close-btn" id="closeCheckoutBtn">✕</button>
-
-    <form id="checkoutForm" class="checkout-form">
-      <h3>Checkout</h3>
-
-      <label>
-        Full Name
-        <input type="text" name="name" placeholder="Your full name" />
-        <span class="field-error" data-field="name"></span>
-      </label>
-
-      <label>
-        Email
-        <input type="email" name="email" placeholder="you@example.com" />
-        <span class="field-error" data-field="email"></span>
-      </label>
-
-      <label>
-        Phone Number
-        <input type="tel" name="phone" placeholder="10-digit phone number" />
-        <span class="field-error" data-field="phone"></span>
-      </label>
-
-      <label>
-        Delivery Address
-        <textarea name="address" rows="3" placeholder="Street, City, State, PIN code"></textarea>
-        <span class="field-error" data-field="address"></span>
-      </label>
-
-      <div class="checkout-total-row">
-        <span>Total Payable</span>
-        <span id="checkoutTotal">₹0</span>
+    <div class="drawer-footer">
+      <div class="cart-summary">
+        <span>Subtotal:</span>
+        <span id="cart-subtotal">$0.00</span>
       </div>
-
-      <button type="submit" class="btn-place-order">Place Order</button>
-    </form>
-
-    <div class="confirmation-view hidden" id="confirmationView">
-      <div class="confirmation-icon">✅</div>
-      <h3>Order Placed Successfully!</h3>
-      <p>Your order ID is <strong id="orderId"></strong></p>
-      <p class="confirmation-note">A confirmation would normally be emailed to you. Thanks for shopping with ShopEase!</p>
+      <button id="checkout-btn" class="btn btn-primary btn-block">Proceed to Checkout</button>
     </div>
   </div>
 
-  <!-- ===================== TOAST ===================== -->
-  <div class="toast" id="toast"></div>
+  <!-- Checkout Form Modal -->
+  <div id="checkout-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Secure Checkout</h2>
+        <button id="close-modal" class="btn-close">&times;</button>
+      </div>
+      <form id="checkout-form" novalidate>
+        <div class="form-group">
+          <label for="full-name">Full Name *</label>
+          <input type="text" id="full-name" required>
+          <span class="error-msg" id="name-error"></span>
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" required>
+          <span class="error-msg" id="email-error"></span>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number (10 Digits) *</label>
+          <input type="tel" id="phone" required pattern="[0-9]{10}">
+          <span class="error-msg" id="phone-error"></span>
+        </div>
+        <div class="form-group">
+          <label for="address">Shipping Address *</label>
+          <textarea id="address" rows="3" required></textarea>
+          <span class="error-msg" id="address-error"></span>
+        </div>
+        <button type="submit" class="btn btn-success btn-block">Place Order</button>
+      </form>
+    </div>
+  </div>
 
-  <footer class="footer">
-    <p>ShopEase &mdash; Built with HTML, CSS &amp; JavaScript (Vanilla)</p>
-  </footer>
+  <!-- Order Confirmation Success View overlay -->
+  <div id="confirmation-modal" class="modal">
+    <div class="modal-content success-card">
+      <div class="success-icon">🎉</div>
+      <h2>Order Confirmed!</h2>
+      <p>Thank you for shopping with ShopEase. Your order has been placed successfully.</p>
+      <div class="order-id-box">
+        Order ID: <strong id="summary-order-id">#000000</strong>
+      </div>
+      <button id="close-confirmation" class="btn btn-primary">Continue Shopping</button>
+    </div>
+  </div>
 
+  <!-- Global Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Scripts -->
   <script src="js/data.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/app.js"></script>
