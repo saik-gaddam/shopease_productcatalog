@@ -4,15 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ShopEase — Multi-Step E-commerce Catalog</title>
+  <!-- Linked directly to root style.css to prevent folder bugs -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Header & Navigation -->
+
+  <!-- Header Section -->
   <header class="header">
-    <div class="header-inner container">
+    <div class="container header-inner">
       <h1 class="logo">ShopEase</h1>
       <div class="header-actions">
-        <button id="theme-toggle" class="btn-icon" aria-label="Toggle Dark Mode">🌓</button>
+        <button id="theme-toggle" class="btn-icon" aria-label="Toggle Theme">🌓</button>
         <button id="cart-nav-btn" class="btn-icon" aria-label="View Cart">
           🛒 <span id="cart-count" class="cart-badge">0</span>
         </button>
@@ -20,30 +22,34 @@
     </div>
   </header>
 
-  <!-- Step Progress Indicator -->
+  <!-- Multi-Step Progress Indicator Bar -->
   <div class="container wizard-progress-container">
-    <div class="wizard-progress">
-      <div class="progress-step active" id="step-dot-1">1<span>Products</span></div>
+    <nav class="wizard-progress">
+      <div class="progress-step active" id="badge-step-1">1 <span>Products</span></div>
       <div class="progress-line"></div>
-      <div class="progress-step" id="step-dot-2">2<span>Your Cart</span></div>
+      <div class="progress-step" id="badge-step-2">2 <span>Your Cart</span></div>
       <div class="progress-line"></div>
-      <div class="progress-step" id="step-dot-3">3<span>Checkout</span></div>
-    </div>
+      <div class="progress-step" id="badge-step-3">3 <span>Checkout</span></div>
+    </nav>
   </div>
 
-  <!-- Wizard Steps Container -->
-  <main class="container main-content">
+  <main class="container">
     
-    <!-- STEP 1: PRODUCT CATALOG -->
+    <!-- STEP 1: PRODUCT CATALOG ARCHITECTURE -->
     <section id="step-1" class="wizard-step active">
-      <div class="toolbar" aria-label="Catalog Filters">
-        <input type="text" id="search-input" placeholder="Search products...">
+      <div class="step-header">
+        <h2>Available Products</h2>
+      </div>
+      
+      <!-- Toolbar Filtering System Controls -->
+      <div class="toolbar">
+        <input type="text" id="search-input" placeholder="Search products..." autocomplete="off">
         <select id="category-filter">
           <option value="all">All Categories</option>
-          <option value="electronics">Electronics</option>
           <option value="clothing">Clothing</option>
+          <option value="electronics">Electronics</option>
           <option value="books">Books</option>
-          <option value="home">Home & Kitchen</option>
+          <option value="home & kitchen">Home & Kitchen</option>
         </select>
         <select id="sort-select">
           <option value="default">Sort By</option>
@@ -52,83 +58,88 @@
           <option value="rating">Top Rated</option>
         </select>
       </div>
+
+      <!-- Dynamic Rendering Target Product Grid -->
       <div id="product-grid" class="product-grid"></div>
     </section>
 
-    <!-- STEP 2: DEDICATED CART PAGE -->
+    <!-- STEP 2: SHOPPING CART OVERVIEW -->
     <section id="step-2" class="wizard-step">
       <div class="step-header">
-        <h2>Review Your Shopping Cart</h2>
+        <h2>Your Shopping Cart</h2>
       </div>
-      <div id="cart-items" class="cart-items-wrapper">
-        <!-- Dynamic items list -->
-      </div>
+      
+      <div id="cart-items" class="cart-items-wrapper"></div>
+      
       <div class="cart-summary-box">
         <div class="cart-summary-row">
           <span>Subtotal:</span>
           <span id="cart-subtotal">$0.00</span>
         </div>
-        <div class="step-navigation-buttons">
-          <button class="btn btn-secondary prev-step-btn" data-target="1">← Back to Shopping</button>
-          <button id="checkout-btn" class="btn btn-primary">Proceed to Checkout →</button>
-        </div>
+      </div>
+
+      <div class="step-navigation-buttons">
+        <button class="btn btn-secondary prev-step-btn" data-target="1">Back to Shop</button>
+        <button id="checkout-btn" class="btn btn-primary" disabled>Proceed to Checkout</button>
       </div>
     </section>
 
-    <!-- STEP 3: SECURE CHECKOUT FORM -->
+    <!-- STEP 3: SECURE CHECKOUT OUTLINE -->
     <section id="step-3" class="wizard-step">
       <div class="step-header">
-        <h2>Secure Checkout</h2>
+        <h2>Shipping & Checkout</h2>
       </div>
+      
       <form id="checkout-form" class="checkout-wizard-form" novalidate>
         <div class="form-group">
-          <label for="full-name">Full Name *</label>
-          <input type="text" id="full-name" required>
-          <span class="error-msg" id="name-error"></span>
+          <label for="full-name">Full Name</label>
+          <input type="text" id="full-name" placeholder="John Doe">
+          <span class="error-msg"></span>
         </div>
         <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input type="email" id="email" required>
-          <span class="error-msg" id="email-error"></span>
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="john@example.com">
+          <span class="error-msg"></span>
         </div>
         <div class="form-group">
-          <label for="phone">Phone Number (10 Digits) *</label>
-          <input type="tel" id="phone" required pattern="[0-9]{10}">
-          <span class="error-msg" id="phone-error"></span>
+          <label for="phone">Phone Number (10 digits)</label>
+          <input type="tel" id="phone" placeholder="1234567890">
+          <span class="error-msg"></span>
         </div>
         <div class="form-group">
-          <label for="address">Shipping Address *</label>
-          <textarea id="address" rows="3" required></textarea>
-          <span class="error-msg" id="address-error"></span>
+          <label for="address">Shipping Address</label>
+          <textarea id="address" rows="3" placeholder="123 Main St, Apt 4B..."></textarea>
+          <span class="error-msg"></span>
         </div>
+
         <div class="step-navigation-buttons">
-          <button type="button" class="btn btn-secondary prev-step-btn" data-target="2">← Back to Cart</button>
-          <button type="submit" class="btn btn-success">Complete & Place Order 🎉</button>
+          <button type="button" class="btn btn-secondary prev-step-btn" data-target="2">Back to Cart</button>
+          <button type="submit" class="btn btn-success">Place Order</button>
         </div>
       </form>
     </section>
 
-    <!-- FINAL CONFIRMATION OVERLAY (MODAL) -->
-    <div id="confirmation-modal" class="modal">
-      <div class="modal-content success-card">
-        <div class="success-icon">🎉</div>
-        <h2>Order Confirmed!</h2>
-        <p>Thank you for shopping with ShopEase. Your order has been placed successfully.</p>
-        <div class="order-id-box">
-          Order ID: <strong id="summary-order-id">#000000</strong>
-        </div>
-        <button id="close-confirmation" class="btn btn-primary">Continue Shopping</button>
-      </div>
-    </div>
-
   </main>
 
-  <!-- Global Toast Notification Container -->
+  <!-- CONFIRMATION MODAL SYSTEM OVERLAY (Removed 'open' class safely) -->
+  <div id="confirmation-modal" class="modal">
+    <div class="modal-content">
+      <div class="success-icon">🎉</div>
+      <h2>Order Confirmed!</h2>
+      <p>Thank you for shopping with ShopEase. Your order has been placed successfully.</p>
+      <div class="order-id-box">
+        Order ID: <strong id="summary-order-id">#000000</strong>
+      </div>
+      <button id="close-confirmation" class="btn btn-primary">Continue Shopping</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Dynamic Engine Port -->
   <div id="toast-container" class="toast-container"></div>
 
-<!-- Ensure these paths completely match your repository structure -->
-  <script src="js/products.js"></script>
-  <script src="js/cart.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Script Pipeline Hooks explicitly loaded from the root folder -->
+  <script src="products.js"></script>
+  <script src="cart.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
