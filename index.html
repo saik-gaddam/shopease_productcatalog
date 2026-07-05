@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- Header Layout Elements -->
+  <!-- App Header Section -->
   <header class="app-header">
     <div class="header-container">
       <h1 class="logo">ShopEase</h1>
@@ -21,7 +21,7 @@
     </div>
   </header>
 
-  <!-- Progress Bar Framework Tracker -->
+  <!-- Progress Bar Steps Component -->
   <div class="progress-bar-wrapper">
     <div class="progress-steps-container">
       <div class="progress-step active" data-step="1">1. Choose Products</div>
@@ -30,13 +30,13 @@
     </div>
   </div>
 
-  <!-- Wizard Application Windows -->
+  <!-- Wizard Steps Containers Manager -->
   <main class="main-content">
     <div class="container">
 
-      <!-- STEP 1: CATALOG OVERVIEW -->
+      <!-- STEP 1: CATALOG GRID AND HERO CAROUSEL -->
       <section id="step-1" class="wizard-step active">
-        <!-- Running Carousel Banner Framework Container -->
+        <!-- Running Hero Carousel Banner -->
         <div class="banner-carousel-wrapper">
           <div id="hero-banner-carousel" class="banner-carousel"></div>
         </div>
@@ -69,7 +69,7 @@
         <div id="product-grid" class="products-grid"></div>
       </section>
 
-      <!-- STEP 2: BASKET BREAKDOWN -->
+      <!-- STEP 2: SHOPPING CART BREAKDOWN -->
       <section id="step-2" class="wizard-step">
         <h2 class="section-title">Your Selected Items</h2>
         <div class="cart-layout">
@@ -88,7 +88,7 @@
         </div>
       </section>
 
-      <!-- STEP 3: CUSTOMER CHECKOUT -->
+      <!-- STEP 3: BILLING AND CHECKOUT DETAILS -->
       <section id="step-3" class="wizard-step">
         <h2 class="section-title">Shipping & Settlement Details</h2>
         <div class="checkout-form-container">
@@ -141,10 +141,10 @@
     </div>
   </main>
 
-  <!-- Notification Toast Container -->
+  <!-- Notification Toast Layer -->
   <div id="toast-container" class="toast-wrapper"></div>
 
-  <!-- Final Confirmation Success Modal Box -->
+  <!-- Success Confirmation Modal -->
   <div id="confirmation-modal" class="modal-backdrop">
     <div class="modal-box">
       <div class="success-icon">🎉</div>
@@ -154,6 +154,7 @@
     </div>
   </div>
 
+  <!-- Execution Dependencies -->
   <script src="products.js"></script>
   <script src="cart.js"></script>
   <script src="app.js"></script>
